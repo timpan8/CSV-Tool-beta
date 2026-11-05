@@ -1,5 +1,5 @@
 import type { ComponentChildren } from 'preact'
-import { useEffect, useLayoutEffect, useRef } from 'preact/hooks'
+import { useLayoutEffect, useRef } from 'preact/hooks'
 import { t } from '../sprak.js'
 
 /**
@@ -57,7 +57,35 @@ export interface Fot {
 }
 
 /** Ytorna som är uppe, i öppningsordning. Den sista äger Escape. */
-const oppna: symbol[] = []
+interface Oppen {
+  id: symbol
+  rot: HTMLElement | null
+  stang: () => void
+}
+const oppna: Oppen[] = []
+
+/*
+ * En enda lyssnare för alla ytor, registrerad när den första öppnas.
+ *
+ * Lyssnaren hör ihop med stapeln och inte med komponenten: en lyssnare i
+ * en `useEffect` finns först efter målningen, och ett Escape som kommer
+ * mellan att dialogen syns och att dess effekt körts hade då ingen tagit —
+ * panelen under såg dialogen överst och lät bli, dialogen lyssnade inte än.
+ */
+let lyssnar = false
+function paEscape(e: KeyboardEvent): void {
+  if (e.key !== 'Escape' || e.defaultPrevented) return
+  const overst = oppna[oppna.length - 1]
+  if (!overst) return
+  const mal = e.target as HTMLElement | null
+  if (textfalt(mal) && overst.rot?.contains(mal)) {
+    // Första Escape lämnar fältet. Nästa stänger.
+    mal?.blur()
+    return
+  }
+  e.preventDefault()
+  overst.stang()
+}
 
 function textfalt(el: Element | null): boolean {
   if (!el) return false
@@ -87,20 +115,30 @@ export function Verktygsyta(props: {
   // Avbryt när det finns något att avstå från, Stäng när ytan bara visar.
   const sekundar = fot.sekundar ?? { etikett: fot.primar ? t('Avbryt') : t('Stäng'), kor: onStang }
 
+  // Escape ska köra den senaste stängningen, inte den från ritningen när
+  // ytan öppnades.
+  const stang = useRef(sekundar.kor)
+  stang.current = sekundar.kor
+
   // Registrering och fokus. Layout-effekten körs innan skärmen målas, så
-  // fokus hinner aldrig synas på fel ställe.
+  // fokus hinner aldrig synas på fel ställe och Escape har en ägare från
+  // första ögonblicket.
   useLayoutEffect(() => {
     const mitt = id.current
     // Elementet hämtas nu: vid avmonteringen kan referensen redan vara tömd.
     const el = rot.current
-    oppna.push(mitt)
+    oppna.push({ id: mitt, rot: el, stang: () => stang.current() })
+    if (!lyssnar) {
+      window.addEventListener('keydown', paEscape)
+      lyssnar = true
+    }
     const fore = document.activeElement as HTMLElement | null
     if (yta === 'dialog') {
       const forsta = el?.querySelector<HTMLElement>(`.modal__kropp :is(${FOKUSERBART})`)
       ;(forsta ?? el)?.focus()
     }
     return () => {
-      const i = oppna.indexOf(mitt)
+      const i = oppna.findIndex((o) => o.id === mitt)
       if (i >= 0) oppna.splice(i, 1)
       // Tillbaka dit man kom ifrån — men bara om fokus faktiskt ligger i
       // ytan eller fallit bort. Har användaren klickat någon annanstans
@@ -118,22 +156,6 @@ export function Verktygsyta(props: {
     }
   }, [yta])
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape' || e.defaultPrevented) return
-      if (oppna[oppna.length - 1] !== id.current) return
-      const mal = e.target as HTMLElement | null
-      if (textfalt(mal) && rot.current?.contains(mal)) {
-        // Första Escape lämnar fältet. Nästa stänger.
-        mal?.blur()
-        return
-      }
-      e.preventDefault()
-      sekundar.kor()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [sekundar.kor])
 
   const onKeyDown = (e: KeyboardEvent) => {
     const mal = e.target as HTMLElement | null
