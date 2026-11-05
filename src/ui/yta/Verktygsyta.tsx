@@ -84,10 +84,8 @@ export function Verktygsyta(props: {
   const rot = useRef<HTMLElement>(null)
   const id = useRef(Symbol('yta'))
   const { yta, onStang, fot } = props
-  const sekundar = fot.sekundar ?? {
-    etikett: yta === 'dialog' || fot.primar ? t('Avbryt') : t('Stäng'),
-    kor: onStang,
-  }
+  // Avbryt när det finns något att avstå från, Stäng när ytan bara visar.
+  const sekundar = fot.sekundar ?? { etikett: fot.primar ? t('Avbryt') : t('Stäng'), kor: onStang }
 
   // Registrering och fokus. Layout-effekten körs innan skärmen målas, så
   // fokus hinner aldrig synas på fel ställe.
@@ -108,9 +106,15 @@ export function Verktygsyta(props: {
       // ytan eller fallit bort. Har användaren klickat någon annanstans
       // under tiden är det valet som gäller.
       const nu = document.activeElement
-      if (fore && fore.isConnected && (nu === null || nu === document.body || el?.contains(nu))) {
+      if (nu !== null && nu !== document.body && !el?.contains(nu)) return
+      if (fore && fore.isConnected && fore !== document.body) {
         fore.focus()
+        return
       }
+      // Den som öppnade panelen från en meny hade menyns knapp i fokus, och
+      // den finns inte längre. Rutnätet är då rätt plats att landa på: det är
+      // det panelen verkade på.
+      if (yta === 'panel') document.querySelector<HTMLElement>('[role=grid]')?.focus()
     }
   }, [yta])
 

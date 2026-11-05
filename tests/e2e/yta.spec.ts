@@ -100,7 +100,7 @@ test('en dialog ovanpå en panel tar Escape själv', async ({ page }) => {
 
 test('foten står i samma ordning i alla verktyg', async ({ page }) => {
   await oppnaExempel(page)
-  await page.getByRole('button', { name: 'Sortera' }).click()
+  await page.getByRole('button', { name: 'Sortera', exact: true }).click()
   const fot = page.locator('.verktyg__fot')
   // Destruktiv till vänster, Stäng till höger. Ingen primär: sorteringen verkar direkt.
   await expect(fot.locator('.knapp').first()).toHaveText('Ta bort sorteringen')
