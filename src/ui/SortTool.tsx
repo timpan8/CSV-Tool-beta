@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks'
-import { Verktygspanel } from './Verktygspanel.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import { Notis, Val } from './parts.js'
 import type { ColumnId, ColumnType, Frame } from '../core/types.js'
 import { visibleColumns } from '../core/frame/frame.js'
@@ -66,7 +66,8 @@ export function SortTool(props: {
   const allaAnvanda = nivaer.length >= kolumner.length
 
   return (
-    <Verktygspanel
+    <Verktygsyta
+      yta="panel"
       titel={t('Sortera')}
       underrubrik={
         nivaer.length === 0
@@ -74,20 +75,16 @@ export function SortTool(props: {
           : `${formatCount(nivaer.length)} ${t(nivaer.length === 1 ? 'nivå' : 'nivåer')}`
       }
       onStang={props.onStang}
-      fot={
-        <>
-          <button
-            class="knapp"
-            disabled={nivaer.length === 0}
-            onClick={() => props.onNivaer([])}
-          >
-            {t('Ta bort sorteringen')}
-          </button>
-          <button class="knapp knapp--primar" onClick={props.onStang}>
-            {t('Klar')}
-          </button>
-        </>
-      }
+      fot={{
+        // Sorteringen verkar direkt, så det finns inget att tillämpa: foten
+        // har bara en väg ut och en väg att ångra sig.
+        sekundar: { etikett: t('Stäng'), kor: props.onStang },
+        destruktiv: {
+          etikett: t('Ta bort sorteringen'),
+          kan: nivaer.length > 0,
+          kor: () => props.onNivaer([]),
+        },
+      }}
     >
       {props.inaktuell && (
         <Notis ton="varning">
@@ -216,7 +213,7 @@ export function SortTool(props: {
           'En nivå på färg lägger raderna i palettens ordning — blå, orange, grön, gul, rosa, lila, röd — med de ofärgade sist.',
         )}
       </Notis>
-    </Verktygspanel>
+    </Verktygsyta>
   )
 }
 

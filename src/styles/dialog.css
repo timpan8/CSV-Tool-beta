@@ -162,8 +162,14 @@
   background: var(--yta-2);
 }
 
-.modal__fot > .knapp:first-of-type {
-  margin-left: auto;
+/*
+ * Fotens ordning är fast: en destruktiv knapp längst till vänster, sedan
+ * ett tomrum, sedan övriga vägar ut, den sekundära och den primära längst
+ * till höger. Tomrummet är ett element och inte en marginal på "första
+ * knappen", för första knappen är inte alltid den som ska stå till vänster.
+ */
+.yta__fot-mellan {
+  flex: 1;
 }
 
 /* ---------- Formulär ---------- */

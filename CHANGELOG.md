@@ -6,6 +6,14 @@ samma kod gått till [CSV-Tool](https://github.com/timpan8/CSV-Tool).
 
 ## [Ej släppt]
 
+### Ändrat
+- Verktygen bor i en och samma behållare, med en fast fot: primär knapp till höger (Enter), *Avbryt*
+  eller *Stäng* bredvid (Escape), och en röd knapp längst till vänster för det som tar bort. Enter
+  tillämpar när du står i ett fält i panelen; Escape lämnar fältet först och stänger sedan. En dialog
+  tar fokus till sitt första fält och lämnar tillbaka det när den stängs.
+- Sortera och Filter stängs med *Stäng* i stället för *Klar*; Dubbletter avbryts med *Avbryt*.
+  Profilernas *Stäng* är inte längre en primärknapp.
+
 ## [0.2.0-beta.1] – 2026-11-05
 
 Första betan. Samma kod som CSV-Tool 0.1.0 plus beta-identiteten.
