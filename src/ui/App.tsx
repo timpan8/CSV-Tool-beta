@@ -131,7 +131,7 @@ import { GrupperaDialog } from './GrupperaDialog.jsx'
 import { SlaIhop } from './SlaIhop.jsx'
 import { ProfilDialog } from './ProfilDialog.jsx'
 import { Kommandopalett } from './Kommandopalett.jsx'
-import { byggKommandon } from './kommandon.js'
+import { byggKommandon, korGenvag, tillMenypost, type Kommando } from './kommandon.js'
 import { mallTabId, oppnaKombinera, vantarPaMall } from '../state/kombinera.js'
 import { oppnaSlaIhop, stangSlaIhop } from '../state/slaihop.js'
 import { oppnaJamfor } from '../state/jamfor.js'
@@ -771,6 +771,17 @@ export function App() {
     }
   }
 
+  const fyllNedatMarkering = () => {
+    const n = nuLage()
+    if (!n?.sel) return
+    const andrade = fyllNedat(n.tab, n.sel)
+    if (andrade > 0) {
+      notify(tf('Fyllde nedåt i {0}.', celler(andrade)), {
+        atgard: { etikett: t('Ångra'), kor: () => undo(n.tab) },
+      })
+    }
+  }
+
   const tomMarkering = () => {
     const nu = nuLage()
     if (!nu || !nu.sel) return
@@ -1249,6 +1260,12 @@ export function App() {
    * först, infoga tom kolumn, byt namn — hör hemma på rubriken. Det är hela
    * skillnaden mellan en meny som hjälper och en som måste läsas.
    */
+  /** En menypost ur registret. Ett id som saknas i läget ger en avstängd post, aldrig ett hål. */
+  const kommando = (id: string, extra: Partial<MenyPost> = {}): MenyPost => {
+    const k = lagen.current.kommandon.find((k) => k.id === id)
+    return k ? tillMenypost(k, extra) : { etikett: id, inaktiv: t('Inte tillgängligt just nu.') }
+  }
+
   const cellmenyposter = (rad: number, kol: number): (MenyPost | 'avdelare')[] => {
     const nu = nuLage()
     if (!nu) return []
@@ -1265,31 +1282,19 @@ export function App() {
     const verktygskolumner = r ? nu.kolumner.slice(r.k1, r.k2 + 1) : [col]
 
     return [
-      { etikett: t('Klipp ut'), genvag: 'Ctrl+X', kor: () => void klippUtMarkering() },
-      { etikett: t('Kopiera'), genvag: 'Ctrl+C', kor: () => void kopieraMarkering() },
-      { etikett: t('Klistra in'), genvag: 'Ctrl+V', kor: () => void klistraInFranMeny() },
-      {
-        etikett: t('Klistra in som ny fil'),
-        genvag: 'Ctrl+Skift+V',
-        skal: t('lämnar den här tabellen orörd'),
-        kor: () => void klistraInSomNyFilFranMeny(),
-      },
+      // Urklippsposterna kommer ur registret, så genvägen som står här är
+      // alltid den som tangentbordet faktiskt lyssnar på.
+      kommando('klipput'),
+      kommando('kopiera'),
+      kommando('klistrain'),
+      kommando('klistrasomfil', { skal: t('lämnar den här tabellen orörd') }),
       'avdelare',
       {
         etikett: flera ? 'Fyll markeringen med ett värde…' : 'Skriv ett värde…',
         kor: fyllMarkering,
       },
-      { etikett: t('Fyll nedåt'), genvag: 'Ctrl+D', kor: () => {
-        const n = nuLage()
-        if (!n?.sel) return
-        const andrade = fyllNedat(n.tab, n.sel)
-        if (andrade > 0) {
-          notify(tf('Fyllde nedåt i {0}.', celler(andrade)), {
-            atgard: { etikett: t('Ångra'), kor: () => undo(n.tab) },
-          })
-        }
-      } },
-      { etikett: t('Töm'), genvag: 'Delete', kor: tomMarkering },
+      kommando('fyllnedat'),
+      kommando('tom'),
       { etikett: t('Färg'), undermeny: fargmeny((f) => fargaMarkeringen(f)) },
       'avdelare',
       {
@@ -1407,7 +1412,9 @@ export function App() {
     sok: boolean
     /** Stänger den vy som faktiskt ritas överst, eller null när ingen gör det. */
     stangEgenVy: (() => void) | null
-  }>({ palett: false, meny: false, oversikt: false, sok: false, stangEgenVy: null })
+    /** Registret, byggt vid varje ritning: tangentbordet och menyerna läser det härifrån. */
+    kommandon: Kommando[]
+  }>({ palett: false, meny: false, oversikt: false, sok: false, stangEgenVy: null, kommandon: [] })
   lagen.current.palett = palettOppen
   lagen.current.meny = meny !== null
   lagen.current.oversikt = oversiktOppen
@@ -1493,48 +1500,16 @@ export function App() {
 
       const nu = nuLage()
       if (!nu) return
-      const { tab, frame, kolumner: synligaKolumner, sel: markering } = nu
+      const { tab, sel: markering } = nu
 
-      if (mod) {
-        const tangent = e.key.toLowerCase()
-        if (tangent === 'z' && !e.shiftKey) {
-          e.preventDefault()
-          const step = undo(tab)
-          if (step) notify(tf('Ångrade: {0}', step.label))
-        } else if (tangent === 'y' || (tangent === 'z' && e.shiftKey)) {
-          e.preventDefault()
-          const step = redo(tab)
-          if (step) notify(tf('Gjorde om: {0}', step.label))
-        } else if (tangent === 's') {
-          e.preventDefault()
-          setExportOppen(true)
-        } else if (tangent === 'f') {
-          e.preventDefault()
-          setSokOppen(true)
-        } else if (tangent === 'a' && !iFalt) {
-          e.preventDefault()
-          if (frame.view.length > 0 && synligaKolumner.length > 0) {
-            setSelection(tab, {
-              ankareRad: 0,
-              ankareKol: 0,
-              fokusRad: frame.view.length - 1,
-              fokusKol: synligaKolumner.length - 1,
-            })
-          }
-        } else if (tangent === 'c' && !iFalt) {
-          e.preventDefault()
-          void kopieraMarkering()
-        } else if (tangent === 'd' && !iFalt && markering) {
-          e.preventDefault()
-          const andrade = fyllNedat(tab, markering)
-          if (andrade > 0) {
-            notify(tf('Fyllde nedåt i {0}.', celler(andrade)), {
-              atgard: { etikett: t('Ångra'), kor: () => tab && undo(tab) },
-            })
-          }
-        }
-        return
-      }
+      /*
+       * Genvägarna bor i registret. Ctrl+Z, Ctrl+S, Ctrl+F, Ctrl+X, Ctrl+C,
+       * Ctrl+D, Ctrl+A och Delete är kommandon med en genväg, inte fall i en
+       * switch — samma lista som paletten visar och menyerna skriver ut.
+       */
+      if (korGenvag(lagen.current.kommandon, e, iFalt)) return
+      // Övriga modifierade tangenter lämnas åt webbläsaren.
+      if (mod) return
 
       if (iFalt) return
 
@@ -1876,6 +1851,131 @@ export function App() {
       },
     },
   ]
+
+  /*
+   * Registret byggs vid varje ritning, ur det läge som gäller just nu, och
+   * läggs i `lagen` så att tangenthanteraren och menyerna — som är stängningar
+   * från en tidigare ritning — alltid kör den färska listan.
+   */
+  lagen.current.kommandon = byggKommandon(
+    {
+      harFil: frame !== null,
+      filnamn: frame?.name ?? null,
+      kolumn: palettKolumn?.name ?? null,
+      kolumnDold: palettKolumn?.hidden ?? false,
+      harMarkering: markering !== null,
+      kanAngra: canUndo(tab),
+      kanGoraOm: canRedo(tab),
+      begransadVy: begransad,
+      parkerad: (() => {
+        const l = sessionslage()
+        return l.lage === 'redo' ? l.namn : null
+      })(),
+    },
+    {
+      fortsattVerkstad: aterta,
+      klippUt: () => void klippUtMarkering(),
+      kopiera: () => void kopieraMarkering(),
+      klistraIn: () => void klistraInFranMeny(),
+      fyllNedat: fyllNedatMarkering,
+      tomMarkering,
+      markeraAllt: () => {
+        if (!tab || !frame) return
+        if (frame.view.length > 0 && synligaKolumner.length > 0) {
+          setSelection(tab, {
+            ankareRad: 0,
+            ankareKol: 0,
+            fokusRad: frame.view.length - 1,
+            fokusKol: synligaKolumner.length - 1,
+          })
+        }
+      },
+      oppnaFil: () => palettFil.current?.click(),
+      borjaOm: () => setBorjaOmOppen(true),
+      glomSparat: () => {
+        void glomSparat().then(() =>
+          notify(
+            'Det sparade är borta. Flikarna du har öppna står kvar, och det du gör härnäst sparas som vanligt.',
+          ),
+        )
+      },
+      exportera: () => setExportOppen(true),
+      profiler: () => setProfilerOppna(true),
+      // Sökraden och tabellverktygen ritas bara i rutnätsläget, så en
+      // egen vy måste stängas först — annars sätts ett läge som inte
+      // syns förrän vyn råkar stängas. Se `stangEgnaVyer`.
+      sok: () => {
+        stangEgnaVyer()
+        setSokOppen(true)
+      },
+      sortera: () => {
+        stangEgnaVyer()
+        oppnaTabellverktyg('sortera')
+      },
+      filter: () => {
+        stangEgnaVyer()
+        oppnaTabellverktyg('filter')
+      },
+      dubbletter: () => {
+        stangEgnaVyer()
+        oppnaTabellverktyg('dubbletter')
+      },
+      slaIhop: () => oppnaSlaIhop(),
+      jamfor: () => oppnaJamfor(),
+      kombinera: () => oppnaKombinera(),
+      mall: () => oppnaKombinera(true),
+      sammanfatta: () => setSammanfatta({ startkolumn: palettKolumn?.id ?? null }),
+      pivot: () => oppnaPivot(),
+      oversikt: () => oppnaVy({ typ: 'oversikt' }),
+      visaAllaRader: () => {
+        if (!tab) return
+        setSokOppen(false)
+        clearViewSpec(tab)
+      },
+      stada,
+      verktyg: (namn) => palettKolumn && oppnaVerktyg(namn, palettKolumn.id),
+      dopOm: () => palettKolumn && dopOmKolumn(palettKolumn.id),
+      dopOmFil: () => tab && setDopOmFlikId(tab.id),
+      duplicera: () => palettKolumn && dupliceraKolumn(palettKolumn.id),
+      vaxlaDold: () => palettKolumn && vaxlaDold(palettKolumn.id),
+      fargaMarkering: (farg) => fargaMarkeringen(farg),
+      kolumnfarg: (farg) => {
+        if (tab && palettKolumn) sattKolumnfarg(tab, palettKolumn, farg)
+      },
+      taBortKolumn: () => palettKolumn && taBortKolumn(palettKolumn.id),
+      infogaKolumn: () => infogaKolumn(),
+      lopnummer: laggTillNummerkolumn,
+      klistraSomFil: () => void klistraInSomNyFilFranMeny(),
+      filtreraKolumn: () => palettKolumn && filtreraKolumn(palettKolumn.id),
+      visaOgiltiga: () => palettKolumn && visaOgiltiga(palettKolumn.id),
+      infogaRadOvan: () =>
+        tab && markering && infogaRader(tab, markering.fokusRad, 1, false),
+      infogaRadUnder: () =>
+        tab && markering && infogaRader(tab, markering.fokusRad, 1, true),
+      dupliceraRader: () =>
+        tab && markering && dupliceraRader(tab, selectedRows(tab, markering)),
+      taBortRader: taBortMarkeradeRader,
+      tommaRader: stadaTommaRader,
+      tommaKolumner: stadaTommaKolumner,
+      angra: () => {
+        if (!tab) return
+        const step = undo(tab)
+        if (step) notify(tf('Ångrade: {0}', step.label))
+      },
+      goraOm: () => {
+        if (!tab) return
+        const step = redo(tab)
+        if (step) notify(tf('Gjorde om: {0}', step.label))
+      },
+      vaxlaTema: () => {
+        theme.value = theme.value === 'dark' ? 'light' : 'dark'
+      },
+      vaxlaSprak: () => sattSprak(sprak.value === 'en' ? 'sv' : 'en'),
+      vaxlaVerktygsfalt: () => {
+        verktygsfalt.value = verktygsfalt.value === 'rad' ? 'lodrat' : 'rad'
+      },
+    },
+  )
 
   return (
     <div class="app">
@@ -2342,109 +2442,7 @@ export function App() {
 
       {palettOppen && (
         <Kommandopalett
-          kommandon={byggKommandon(
-            {
-              harFil: frame !== null,
-              filnamn: frame?.name ?? null,
-              kolumn: palettKolumn?.name ?? null,
-              kolumnDold: palettKolumn?.hidden ?? false,
-              harMarkering: markering !== null,
-              kanAngra: canUndo(tab),
-              kanGoraOm: canRedo(tab),
-              begransadVy: begransad,
-              parkerad: (() => {
-                const l = sessionslage()
-                return l.lage === 'redo' ? l.namn : null
-              })(),
-            },
-            {
-              fortsattVerkstad: aterta,
-              oppnaFil: () => palettFil.current?.click(),
-              borjaOm: () => setBorjaOmOppen(true),
-              glomSparat: () => {
-                void glomSparat().then(() =>
-                  notify(
-                    'Det sparade är borta. Flikarna du har öppna står kvar, och det du gör härnäst sparas som vanligt.',
-                  ),
-                )
-              },
-              exportera: () => setExportOppen(true),
-              profiler: () => setProfilerOppna(true),
-              // Sökraden och tabellverktygen ritas bara i rutnätsläget, så en
-              // egen vy måste stängas först — annars sätts ett läge som inte
-              // syns förrän vyn råkar stängas. Se `stangEgnaVyer`.
-              sok: () => {
-                stangEgnaVyer()
-                setSokOppen(true)
-              },
-              sortera: () => {
-                stangEgnaVyer()
-                oppnaTabellverktyg('sortera')
-              },
-              filter: () => {
-                stangEgnaVyer()
-                oppnaTabellverktyg('filter')
-              },
-              dubbletter: () => {
-                stangEgnaVyer()
-                oppnaTabellverktyg('dubbletter')
-              },
-              slaIhop: () => oppnaSlaIhop(),
-              jamfor: () => oppnaJamfor(),
-              kombinera: () => oppnaKombinera(),
-              mall: () => oppnaKombinera(true),
-              sammanfatta: () => setSammanfatta({ startkolumn: palettKolumn?.id ?? null }),
-              pivot: () => oppnaPivot(),
-              oversikt: () => oppnaVy({ typ: 'oversikt' }),
-              visaAllaRader: () => {
-                if (!tab) return
-                setSokOppen(false)
-                clearViewSpec(tab)
-              },
-              stada,
-              verktyg: (namn) => palettKolumn && oppnaVerktyg(namn, palettKolumn.id),
-              dopOm: () => palettKolumn && dopOmKolumn(palettKolumn.id),
-              dopOmFil: () => tab && setDopOmFlikId(tab.id),
-              duplicera: () => palettKolumn && dupliceraKolumn(palettKolumn.id),
-              vaxlaDold: () => palettKolumn && vaxlaDold(palettKolumn.id),
-              fargaMarkering: (farg) => fargaMarkeringen(farg),
-              kolumnfarg: (farg) => {
-                if (tab && palettKolumn) sattKolumnfarg(tab, palettKolumn, farg)
-              },
-              taBortKolumn: () => palettKolumn && taBortKolumn(palettKolumn.id),
-              infogaKolumn: () => infogaKolumn(),
-              lopnummer: laggTillNummerkolumn,
-              klistraSomFil: () => void klistraInSomNyFilFranMeny(),
-              filtreraKolumn: () => palettKolumn && filtreraKolumn(palettKolumn.id),
-              visaOgiltiga: () => palettKolumn && visaOgiltiga(palettKolumn.id),
-              infogaRadOvan: () =>
-                tab && markering && infogaRader(tab, markering.fokusRad, 1, false),
-              infogaRadUnder: () =>
-                tab && markering && infogaRader(tab, markering.fokusRad, 1, true),
-              dupliceraRader: () =>
-                tab && markering && dupliceraRader(tab, selectedRows(tab, markering)),
-              taBortRader: taBortMarkeradeRader,
-              tommaRader: stadaTommaRader,
-              tommaKolumner: stadaTommaKolumner,
-              angra: () => {
-                if (!tab) return
-                const step = undo(tab)
-                if (step) notify(tf('Ångrade: {0}', step.label))
-              },
-              goraOm: () => {
-                if (!tab) return
-                const step = redo(tab)
-                if (step) notify(tf('Gjorde om: {0}', step.label))
-              },
-              vaxlaTema: () => {
-                theme.value = theme.value === 'dark' ? 'light' : 'dark'
-              },
-              vaxlaSprak: () => sattSprak(sprak.value === 'en' ? 'sv' : 'en'),
-              vaxlaVerktygsfalt: () => {
-                verktygsfalt.value = verktygsfalt.value === 'rad' ? 'lodrat' : 'rad'
-              },
-            },
-          )}
+          kommandon={lagen.current.kommandon}
           onStang={() => setPalettOppen(false)}
         />
       )}

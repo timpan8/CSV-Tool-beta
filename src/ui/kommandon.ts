@@ -3,14 +3,19 @@ import { STADNINGAR } from '../core/ops/clean.js'
 import { VERKTYG, type Verktygsnamn } from './verktyg.js'
 import { FARGER, fargetikettGement } from './fargetikett.js'
 import { t, tf } from './sprak.js'
+import type { MenyPost } from './parts.js'
+import { matcharGenvag, visaGenvag, type Genvag } from './kommandon/genvagar.js'
 
 /**
- * Kommandolistan bakom paletten.
+ * Kommandoregistret.
  *
- * Verktygsraden, kolumnmenyn, radmenyn och inspektören har var sin kopia av
- * ungefär samma åtgärder. Paletten blir en femte kopia om den byggs för hand,
- * så den byggs i stället här — ur samma `STADNINGAR` och `VERKTYG` som
- * menyerna redan delar, plus de åtgärder som bara finns som knappar.
+ * Verktygsraden, kolumnmenyn, radmenyn och inspektören hade var sin kopia av
+ * ungefär samma åtgärder, och paletten hade blivit en femte om den byggts för
+ * hand. Listan här är i stället den enda: paletten visar den, menyerna hämtar
+ * sina poster ur den med `tillMenypost`, och tangentbordet kör den med
+ * `korGenvag`. En genväg som står i en meny är därför alltid en genväg som
+ * fungerar — det var inte sant förut, när cellmenyn skrev `Ctrl+X` och ingen
+ * tangenthanterare kände till X.
  *
  * Sökningen är bokstavlig, precis som sök & ersätt: alla ord i frågan måste
  * finnas i kommandots text. Ingen luddig matchning, eftersom en palett som
@@ -25,7 +30,16 @@ export interface Kommando {
   grupp: string
   /** Extra sökord — engelska namn och synonymer som inte står i etiketten. */
   ord?: string
-  genvag?: string
+  /** Kanonisk form, `Mod+Shift+V`. Visas med `visaGenvag`, körs med `korGenvag`. */
+  genvag?: Genvag
+  /** Fler tangenter som kör samma sak och inte visas: Ctrl+Skift+Z för Gör om. */
+  genvagar?: Genvag[]
+  /**
+   * Om genvägen får gå igång medan fokus ligger i ett textfält. Ångra,
+   * exportera och sök gör det; kopiera och töm gör det inte, för där betyder
+   * tangenterna något annat i fältet.
+   */
+  iFalt?: boolean
   beskrivning?: string
   kor: () => void
 }
@@ -48,6 +62,12 @@ export interface Kommandolage {
 export interface Kommandohandlare {
   oppnaFil: () => void
   klistraSomFil: () => void
+  klippUt: () => void
+  kopiera: () => void
+  klistraIn: () => void
+  fyllNedat: () => void
+  tomMarkering: () => void
+  markeraAllt: () => void
   dopOmFil: () => void
   exportera: () => void
   profiler: () => void
@@ -101,7 +121,8 @@ export function byggKommandon(lage: Kommandolage, h: Kommandohandlare): Kommando
     id: 'klistrasomfil',
     grupp: t('Fil'),
     etikett: t('Klistra in som ny fil'),
-    genvag: 'Ctrl+Skift+V',
+    genvag: 'Mod+Shift+V',
+    iFalt: true,
     ord: 'paste urklipp klippbord ny flik dokument',
     beskrivning: t(
       'Öppnar det du kopierat som en egen flik i stället för att skriva in det i tabellen du står i.',
@@ -141,7 +162,8 @@ export function byggKommandon(lage: Kommandolage, h: Kommandohandlare): Kommando
       id: 'exportera',
       grupp: t('Fil'),
       etikett: t('Exportera…'),
-      genvag: 'Ctrl+S',
+      genvag: 'Mod+S',
+      iFalt: true,
       ord: 'spara ladda ner xlsx csv export save',
       kor: h.exportera,
     })
@@ -154,7 +176,7 @@ export function byggKommandon(lage: Kommandolage, h: Kommandohandlare): Kommando
       kor: h.profiler,
     })
 
-    lagg({ id: 'sok', grupp: t('Tabell'), etikett: t('Sök…'), genvag: 'Ctrl+F', ord: 'find', kor: h.sok })
+    lagg({ id: 'sok', grupp: t('Tabell'), etikett: t('Sök…'), genvag: 'Mod+F', iFalt: true, ord: 'find', kor: h.sok })
     lagg({ id: 'sortera', grupp: t('Tabell'), etikett: t('Sortera…'), ord: 'ordning sort', kor: h.sortera })
     lagg({ id: 'filter', grupp: t('Tabell'), etikett: t('Filter…'), ord: 'urval regler', kor: h.filter })
     lagg({
@@ -255,6 +277,30 @@ export function byggKommandon(lage: Kommandolage, h: Kommandohandlare): Kommando
       })
     }
 
+    lagg({
+      id: 'markeraallt',
+      grupp: t('Markering'),
+      etikett: t('Markera allt'),
+      genvag: 'Mod+A',
+      ord: 'select all',
+      kor: h.markeraAllt,
+    })
+    if (lage.harMarkering) {
+      lagg({ id: 'klipput', grupp: t('Markering'), etikett: t('Klipp ut'), genvag: 'Mod+X', ord: 'cut', kor: h.klippUt })
+      lagg({ id: 'kopiera', grupp: t('Markering'), etikett: t('Kopiera'), genvag: 'Mod+C', ord: 'copy', kor: h.kopiera })
+      lagg({
+        id: 'klistrain',
+        grupp: t('Markering'),
+        etikett: t('Klistra in'),
+        genvag: 'Mod+V',
+        ord: 'paste',
+        beskrivning: t('Skriver in det du kopierat i tabellen, från den markerade cellen.'),
+        kor: h.klistraIn,
+      })
+      lagg({ id: 'fyllnedat', grupp: t('Markering'), etikett: t('Fyll nedåt'), genvag: 'Mod+D', ord: 'fill down', kor: h.fyllNedat })
+      lagg({ id: 'tom', grupp: t('Markering'), etikett: t('Töm'), genvag: 'Delete', ord: 'clear radera', kor: h.tomMarkering })
+    }
+
     if (lage.harMarkering) {
       for (const s of STADNINGAR) {
         lagg({
@@ -353,10 +399,10 @@ export function byggKommandon(lage: Kommandolage, h: Kommandohandlare): Kommando
     })
 
     if (lage.kanAngra) {
-      lagg({ id: 'angra', grupp: t('Visa'), etikett: t('Ångra'), genvag: 'Ctrl+Z', ord: 'undo', kor: h.angra })
+      lagg({ id: 'angra', grupp: t('Visa'), etikett: t('Ångra'), genvag: 'Mod+Z', iFalt: true, ord: 'undo', kor: h.angra })
     }
     if (lage.kanGoraOm) {
-      lagg({ id: 'goraom', grupp: t('Visa'), etikett: t('Gör om'), genvag: 'Ctrl+Y', ord: 'redo', kor: h.goraOm })
+      lagg({ id: 'goraom', grupp: t('Visa'), etikett: t('Gör om'), genvag: 'Mod+Y', genvagar: ['Mod+Shift+Z'], iFalt: true, ord: 'redo', kor: h.goraOm })
     }
   }
 
@@ -403,4 +449,32 @@ export function sokKommandon(kommandon: readonly Kommando[], fraga: string): Kom
     const text = nyckel(`${k.grupp} ${k.etikett} ${k.ord ?? ''}`)
     return ord.every((o) => text.includes(o))
   })
+}
+
+/** Kommandot som en menypost, med genvägen skriven på plattformens sätt. */
+export function tillMenypost(k: Kommando, extra: Partial<MenyPost> = {}): MenyPost {
+  return {
+    etikett: k.etikett,
+    genvag: k.genvag === undefined ? undefined : visaGenvag(k.genvag),
+    kor: k.kor,
+    ...extra,
+  }
+}
+
+/**
+ * Kör kommandot vars genväg tangenttryckningen är. Sant om något kördes.
+ *
+ * `iTextfalt` säger om fokus ligger i ett fält där tangenterna betyder något
+ * annat; bara kommandon märkta `iFalt` går igång där.
+ */
+export function korGenvag(kommandon: readonly Kommando[], e: KeyboardEvent, iTextfalt: boolean): boolean {
+  for (const k of kommandon) {
+    const alla = k.genvag === undefined ? k.genvagar ?? [] : [k.genvag, ...(k.genvagar ?? [])]
+    if (!alla.some((g) => matcharGenvag(e, g))) continue
+    if (iTextfalt && !k.iFalt) return false
+    e.preventDefault()
+    k.kor()
+    return true
+  }
+  return false
 }
