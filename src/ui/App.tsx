@@ -92,7 +92,8 @@ import { EmptyState } from './EmptyState.jsx'
 import { Redigeringsfalt } from './Redigeringsfalt.jsx'
 import { Pivot } from './Pivot.jsx'
 import { IkonExportera, IkonKugghjul, IkonMane, IkonOppna, IkonProfiler, IkonSol } from './ikoner.jsx'
-import { oppnaPivot, pivotOppen, stangPivot } from '../state/pivot.js'
+import { oppnaPivot, stangPivot } from '../state/pivot.js'
+import { oppnaVy, stangVy, vylage } from '../state/vylage.js'
 import { ImportDialog, type ImportSettings } from './ImportDialog.jsx'
 import { ExportDialog } from './ExportDialog.jsx'
 import { SearchBar } from './SearchBar.jsx'
@@ -122,7 +123,6 @@ import {
   sessionslage,
   verkstad,
   verkstadForFlik,
-  verkstadOppen,
   type Sessionslage,
 } from '../state/matchning.js'
 import type { Profilsteg } from '../core/ops/profil.js'
@@ -132,15 +132,9 @@ import { SlaIhop } from './SlaIhop.jsx'
 import { ProfilDialog } from './ProfilDialog.jsx'
 import { Kommandopalett } from './Kommandopalett.jsx'
 import { byggKommandon } from './kommandon.js'
-import {
-  kombineraOppen,
-  mallTabId,
-  oppnaKombinera,
-  stangKombinera,
-  vantarPaMall,
-} from '../state/kombinera.js'
-import { oppnaSlaIhop, slaIhopOppen, stangSlaIhop } from '../state/slaihop.js'
-import { jamforOppen, oppnaJamfor, stangJamfor } from '../state/jamfor.js'
+import { mallTabId, oppnaKombinera, vantarPaMall } from '../state/kombinera.js'
+import { oppnaSlaIhop, stangSlaIhop } from '../state/slaihop.js'
+import { oppnaJamfor } from '../state/jamfor.js'
 import { Jamfor } from './Jamfor.jsx'
 import { nyRegelId, TOMT_FILTER, type Filterregel } from '../core/ops/filter.js'
 import {
@@ -204,7 +198,9 @@ export function App() {
   const [exportOppen, setExportOppen] = useState(false)
   const [profilerOppna, setProfilerOppna] = useState(false)
   const [palettOppen, setPalettOppen] = useState(false)
-  const [oversiktOppen, setOversiktOppen] = useState(false)
+  // Vilken vy som ligger över rutnätet, om någon. Se `state/vylage.ts`.
+  const vy = vylage.value.typ
+  const oversiktOppen = vy === 'oversikt'
   /**
    * Grupperingsdialogen, med kolumnen man öppnade den från.
    *
@@ -603,15 +599,8 @@ export function App() {
    * en osynlig vy eller panel som äger tangentbordet är precis det felet den
    * härledda Escape-kedjan finns för att undvika.
    */
-  const stangEgnaVyer = () => {
-    stangSlaIhop()
-    stangJamfor()
-    stangKombinera()
-    setOversiktOppen(false)
-    stangPivot()
-    // Vyn, inte sessionen: arbetet ligger kvar precis som vid Escape.
-    lamnaVerkstad()
-  }
+  // Vyn, inte sessionen: verkstadens arbete ligger kvar precis som vid Escape.
+  const stangEgnaVyer = () => stangVy()
 
   const aterta = () => {
     stangEgnaVyer()
@@ -984,7 +973,7 @@ export function App() {
     if (forsta === undefined) return
     setActiveColumn(forsta)
     setTabellverktyg(null)
-    setOversiktOppen(false)
+    stangVy('oversikt')
     setVerktyg({ id: namn, colIds: lista })
   }
 
@@ -1757,35 +1746,19 @@ export function App() {
   // Verkstaden och kombineringen lägger sig över arbetsytan. Rutnätets egna
   // kontroller — sök, filterrad, statusrad och tabellverktygen — hör till en
   // tabell man inte längre tittar på, och skulle visa tal som inte gäller.
-  const iVerkstaden = verkstadOppen.value
-  const iKombinera = kombineraOppen.value
-  const iSlaIhop = slaIhopOppen.value
-  const iJamfor = jamforOppen.value
-  const iPivot = pivotOppen.value
-  const egenVy = iVerkstaden || iKombinera || iSlaIhop || iJamfor || iPivot || oversiktOppen
+  const iVerkstaden = vy === 'verkstad'
+  const iKombinera = vy === 'kombinera'
+  const iSlaIhop = vy === 'slaihop'
+  const iJamfor = vy === 'jamfor'
+  const iPivot = vy === 'pivot'
+  const egenVy = vy !== 'rutnat'
 
   /*
-   * Vilken vy som ligger överst — härlett en gång, läst på två ställen.
-   *
-   * Ordningen här måste vara densamma som i if/else-kedjan nedan, och det är
-   * hela skälet att den bor på ett ställe: förut fanns två oberoende listor i
-   * omvänd ordning, och då kunde Escape stänga en vy som inte syntes medan
-   * den som syntes krävde ett andra tryck. Sedan sessionen får leva vidare med
-   * vyn stängd är det fönstret inte längre kort — det är obegränsat.
+   * Escape stänger vyn som är uppe. Det finns bara en: `vylage` är ett enda
+   * värde, så ingen vy kan ligga dold under den som syns, och det finns
+   * ingen ordning att hålla i synk med ritningen nedan.
    */
-  lagen.current.stangEgenVy = iSlaIhop
-    ? stangSlaIhop
-    : iJamfor
-      ? stangJamfor
-    : iKombinera
-      ? stangKombinera
-      : oversiktOppen
-        ? () => setOversiktOppen(false)
-        : iPivot
-          ? stangPivot
-          : iVerkstaden
-            ? lamnaVerkstad
-            : null
+  lagen.current.stangEgenVy = egenVy ? () => stangVy() : null
 
   /*
    * Redigeringsfältet byggs en gång och placeras efter inställningen: som en
@@ -2128,7 +2101,7 @@ export function App() {
           onSetType={sattTyp}
           onVisaOgiltiga={visaOgiltiga}
           onVerktyg={oppnaVerktyg}
-          onStang={() => setOversiktOppen(false)}
+          onStang={() => stangVy('oversikt')}
         />
       ) : iPivot && frame ? (
         /*
@@ -2194,7 +2167,7 @@ export function App() {
             onMove={flyttaKolumn}
             onInsert={() => infogaKolumn()}
             onUndoThrough={(i) => undoThrough(tab, i)}
-            onOversikt={() => setOversiktOppen(true)}
+            onOversikt={() => oppnaVy({ typ: 'oversikt' })}
           />
           <VirtualGrid
             frame={frame}
@@ -2422,7 +2395,7 @@ export function App() {
               mall: () => oppnaKombinera(true),
               sammanfatta: () => setSammanfatta({ startkolumn: palettKolumn?.id ?? null }),
               pivot: () => oppnaPivot(),
-              oversikt: () => setOversiktOppen(true),
+              oversikt: () => oppnaVy({ typ: 'oversikt' }),
               visaAllaRader: () => {
                 if (!tab) return
                 setSokOppen(false)

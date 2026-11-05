@@ -1,5 +1,5 @@
-import { signal } from '@preact/signals'
 import { tomPlan, type Pivotplan } from '../core/ops/pivot.js'
+import { arUppe, oppnaVy, stangVy } from './vylage.js'
 
 /**
  * Pivotvyns av och på, och planerna den byggt.
@@ -17,16 +17,16 @@ import { tomPlan, type Pivotplan } from '../core/ops/pivot.js'
  * Att det är signaler och inte ett tillstånd i `App` är för att paletten och
  * verktygsfältet ska nå dem utan en handtagskedja genom hela komponenten.
  */
-export const pivotOppen = signal(false)
+export const pivotOppen = arUppe('pivot')
 
 const planer = new Map<string, Pivotplan>()
 
 export function oppnaPivot(): void {
-  pivotOppen.value = true
+  oppnaVy({ typ: 'pivot' })
 }
 
 export function stangPivot(): void {
-  pivotOppen.value = false
+  stangVy('pivot')
 }
 
 /** Flikens sparade plan, eller fyra tomma rutor om det är första gången. */

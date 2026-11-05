@@ -385,19 +385,24 @@ test('en stängd källfil tar verkstaden med sig, och säger det', async ({ page
   await expect(page.getByRole('menuitem', { name: 'Fortsätt beta av resten…' })).toBeDisabled()
 })
 
-test('Escape stänger den vy som syns, inte den som ligger under', async ({ page }) => {
+test('en vy öppnad ovanpå verkstaden ersätter den, och Escape går till rutnätet', async ({ page }) => {
   await oppnaVerkstaden(page)
 
   // Paletten går att öppna ovanpå en egen vy, och därifrån öppnas en annan.
-  // Förut valde Escape efter en egen lista i omvänd ordning mot ritningen, så
-  // den osynliga verkstaden åt tangenttrycket och Slå ihop krävde ett andra.
+  // Det finns bara en vy i taget (`state/vylage.ts`): Slå ihop tar
+  // verkstadens plats, och Escape stänger det man ser — inte en vy som
+  // ligger dold under. Förut valde Escape efter en egen lista i omvänd
+  // ordning mot ritningen, så den osynliga verkstaden åt tangenttrycket.
   await page.keyboard.press('Control+k')
   await page.getByPlaceholder('Vad vill du göra?').fill('Slå ihop med')
   await page.keyboard.press('Enter')
   await expect(page.locator('.slaihop')).toBeVisible()
+  await expect(page.locator('.verkstad')).toHaveCount(0)
 
   await page.keyboard.press('Escape')
   await expect(page.locator('.slaihop')).toHaveCount(0)
-  // Verkstaden var aldrig uppe på skärmen och ska inte ha stängts.
-  await expect(page.locator('.verkstad')).toBeVisible()
+  await expect(page.locator('.verkstad')).toHaveCount(0)
+  // Vyn stängdes, inte arbetet: sessionen ligger parkerad och vägen tillbaka
+  // står i statusraden.
+  await expect(page.locator('.statusrad').getByRole('button', { name: 'Fortsätt' })).toBeVisible()
 })
