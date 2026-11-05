@@ -1,10 +1,14 @@
 /**
  * Designtokens.
  *
- * Ljust läge definieras fullständigt på :root. Mörkt läge redefinierar bara
- * värdena — aldrig strukturen — dels efter systeminställning, dels efter ett
- * uttryckligt val på html[data-theme]. Ingen färg får sin enda definition
- * inuti ett mediablock, annars saknas den när valet går åt andra hållet.
+ * Varje färg definieras **en gång**, med `light-dark(ljus, mörk)`. Vilken
+ * av de två som gäller styrs av `color-scheme` på roten: systemets val som
+ * förval, eller ett uttryckligt val på html[data-theme]. Förut stod den
+ * mörka paletten två gånger — en gång för systemvalet och en gång för det
+ * uttryckliga — och de två listorna kunde bara hållas lika för hand.
+ *
+ * `color-scheme` gör dessutom att webbläsarens egna delar — rullgardiner,
+ * rullningslister, kryssrutor — följer temat utan egen CSS.
  *
  * Färg bär betydelse, aldrig dekoration. Gult betyder "titta på det här",
  * rött betyder "det här tar bort", violett betyder "det här är ännu inte
@@ -12,40 +16,42 @@
  */
 
 :root {
+  color-scheme: light;
+
   /* Ytor */
-  --yta: #ffffff;
-  --yta-2: #f8fafc;
-  --yta-3: #f1f5f9;
-  --yta-hover: #f1f5f9;
-  --yta-aktiv: #e0eaff;
-  --linje: #e2e8f0;
-  --linje-stark: #cbd5e1;
+  --yta: light-dark(#ffffff, #0f172a);
+  --yta-2: light-dark(#f8fafc, #1e293b);
+  --yta-3: light-dark(#f1f5f9, #263449);
+  --yta-hover: light-dark(#f1f5f9, #1e293b);
+  --yta-aktiv: light-dark(#e0eaff, #1e3a8a);
+  --linje: light-dark(#e2e8f0, #334155);
+  --linje-stark: light-dark(#cbd5e1, #475569);
 
   /* Text */
-  --text: #0f172a;
-  --text-svag: #64748b;
-  --text-svagast: #94a3b8;
-  --text-invers: #ffffff;
+  --text: light-dark(#0f172a, #e2e8f0);
+  --text-svag: light-dark(#64748b, #94a3b8);
+  --text-svagast: light-dark(#94a3b8, #64748b);
+  --text-invers: light-dark(#ffffff, #0f172a);
 
   /* Betydelsebärande */
-  --accent: #2563eb;
-  --accent-svag: #dbeafe;
-  --accent-text: #1d4ed8;
-  --forhandsvisning: #7c3aed;
-  --forhandsvisning-svag: #ede9fe;
-  --varning: #d97706;
-  --varning-svag: #fef3c7;
-  --fara: #dc2626;
-  --fara-svag: #fee2e2;
-  --lyckat: #059669;
-  --lyckat-svag: #d1fae5;
+  --accent: light-dark(#2563eb, #60a5fa);
+  --accent-svag: light-dark(#dbeafe, #1e3a5f);
+  --accent-text: light-dark(#1d4ed8, #93c5fd);
+  --forhandsvisning: light-dark(#7c3aed, #a78bfa);
+  --forhandsvisning-svag: light-dark(#ede9fe, #362a5c);
+  --varning: light-dark(#d97706, #fbbf24);
+  --varning-svag: light-dark(#fef3c7, #45330f);
+  --fara: light-dark(#dc2626, #f87171);
+  --fara-svag: light-dark(#fee2e2, #481a1a);
+  --lyckat: light-dark(#059669, #34d399);
+  --lyckat-svag: light-dark(#d1fae5, #10352a);
 
   /* Kolumntyper */
-  --typ-text: #64748b;
-  --typ-tal: #4f46e5;
-  --typ-datum: #0d9488;
-  --typ-epost: #7c3aed;
-  --typ-bool: #d97706;
+  --typ-text: light-dark(#64748b, #94a3b8);
+  --typ-tal: light-dark(#4f46e5, #a5b4fc);
+  --typ-datum: light-dark(#0d9488, #5eead4);
+  --typ-epost: light-dark(#7c3aed, #c4b5fd);
+  --typ-bool: light-dark(#d97706, #fcd34d);
 
   /*
    * Diagramserier.
@@ -68,14 +74,40 @@
    * bort, och för att serier upp till fyra får direktetiketter. Tas någon av
    * de två utvägarna bort måste de tre färgerna göras mörkare.
    */
-  --serie-1: #2a78d6;
-  --serie-2: #eb6834;
-  --serie-3: #1baf7a;
-  --serie-4: #eda100;
-  --serie-5: #e87ba4;
+  --serie-1: light-dark(#2a78d6, #3987e5);
+  --serie-2: light-dark(#eb6834, #d95926);
+  --serie-3: light-dark(#1baf7a, #199e70);
+  --serie-4: light-dark(#eda100, #c98500);
+  --serie-5: light-dark(#e87ba4, #d55181);
   --serie-6: #008300;
-  --serie-7: #4a3aa7;
-  --serie-8: #e34948;
+  --serie-7: light-dark(#4a3aa7, #9085e9);
+  --serie-8: light-dark(#e34948, #e66767);
+
+
+  /*
+   * Lager, från botten. Siffrorna betyder ingenting var för sig, bara
+   * ordningen: släppytan under en dialog, dialogen under en meny (en meny
+   * kan öppnas inifrån en dialog), och notiserna över allt.
+   */
+  --z-slapp: 90;
+  --z-overlagg: 100;
+  --z-meny: 120;
+  --z-toast: 200;
+
+  /* Avstånd. Fyra pixlar är steget; allt annat är multiplar. */
+  --mellanrum-1: 4px;
+  --mellanrum-2: 8px;
+  --mellanrum-3: 12px;
+  --mellanrum-4: 16px;
+  --mellanrum-5: 24px;
+  --mellanrum-6: 32px;
+
+  /* Textstorlekar. Rutnätet och det mesta står i --text-md. */
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-lg: 15px;
+  --text-xl: 18px;
 
   /* Mått */
   --radhojd: 30px;
@@ -96,6 +128,8 @@
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
     'Liberation Mono', monospace;
 
+  /* Skuggor är inte färger och kan inte gå genom light-dark(); de mörka
+     varianterna står i temablocken nedan, som de enda som gör det. */
   --skugga: 0 1px 2px rgb(15 23 42 / 0.06), 0 2px 8px rgb(15 23 42 / 0.06);
   --skugga-hog: 0 4px 12px rgb(15 23 42 / 0.1), 0 12px 32px rgb(15 23 42 / 0.12);
   --frys-skugga: 4px 0 6px -4px rgb(15 23 42 / 0.18);
@@ -103,48 +137,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --yta: #0f172a;
-    --yta-2: #1e293b;
-    --yta-3: #263449;
-    --yta-hover: #1e293b;
-    --yta-aktiv: #1e3a8a;
-    --linje: #334155;
-    --linje-stark: #475569;
-
-    --text: #e2e8f0;
-    --text-svag: #94a3b8;
-    --text-svagast: #64748b;
-    --text-invers: #0f172a;
-
-    --accent: #60a5fa;
-    --accent-svag: #1e3a5f;
-    --accent-text: #93c5fd;
-    --forhandsvisning: #a78bfa;
-    --forhandsvisning-svag: #362a5c;
-    --varning: #fbbf24;
-    --varning-svag: #45330f;
-    --fara: #f87171;
-    --fara-svag: #481a1a;
-    --lyckat: #34d399;
-    --lyckat-svag: #10352a;
-
-    --typ-text: #94a3b8;
-    --typ-tal: #a5b4fc;
-    --typ-datum: #5eead4;
-    --typ-epost: #c4b5fd;
-    --typ-bool: #fcd34d;
-
-    /* Samma åtta nyanser, egna steg för den mörka ytan — inte en vändning av
-       de ljusa. Grönt är sig självt: det klarade båda ytorna som det var. */
-    --serie-1: #3987e5;
-    --serie-2: #d95926;
-    --serie-3: #199e70;
-    --serie-4: #c98500;
-    --serie-5: #d55181;
-    --serie-6: #008300;
-    --serie-7: #9085e9;
-    --serie-8: #e66767;
-
+    color-scheme: dark;
     --skugga: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.3);
     --skugga-hog: 0 4px 12px rgb(0 0 0 / 0.4), 0 12px 32px rgb(0 0 0 / 0.45);
     --frys-skugga: 4px 0 6px -4px rgb(0 0 0 / 0.5);
@@ -152,46 +145,7 @@
 }
 
 :root[data-theme='dark'] {
-  --yta: #0f172a;
-  --yta-2: #1e293b;
-  --yta-3: #263449;
-  --yta-hover: #1e293b;
-  --yta-aktiv: #1e3a8a;
-  --linje: #334155;
-  --linje-stark: #475569;
-
-  --text: #e2e8f0;
-  --text-svag: #94a3b8;
-  --text-svagast: #64748b;
-  --text-invers: #0f172a;
-
-  --accent: #60a5fa;
-  --accent-svag: #1e3a5f;
-  --accent-text: #93c5fd;
-  --forhandsvisning: #a78bfa;
-  --forhandsvisning-svag: #362a5c;
-  --varning: #fbbf24;
-  --varning-svag: #45330f;
-  --fara: #f87171;
-  --fara-svag: #481a1a;
-  --lyckat: #34d399;
-  --lyckat-svag: #10352a;
-
-  --typ-text: #94a3b8;
-  --typ-tal: #a5b4fc;
-  --typ-datum: #5eead4;
-  --typ-epost: #c4b5fd;
-  --typ-bool: #fcd34d;
-
-  --serie-1: #3987e5;
-  --serie-2: #d95926;
-  --serie-3: #199e70;
-  --serie-4: #c98500;
-  --serie-5: #d55181;
-  --serie-6: #008300;
-  --serie-7: #9085e9;
-  --serie-8: #e66767;
-
+  color-scheme: dark;
   --skugga: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.3);
   --skugga-hog: 0 4px 12px rgb(0 0 0 / 0.4), 0 12px 32px rgb(0 0 0 / 0.45);
   --frys-skugga: 4px 0 6px -4px rgb(0 0 0 / 0.5);
