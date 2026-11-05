@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'preact/hooks'
-import { Modal, Notis, Val } from './parts.js'
+import { Notis, Val } from './parts.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import type { ColumnId, Frame } from '../core/types.js'
 import {
   BERAKNINGAR,
@@ -109,40 +110,27 @@ export function GrupperaDialog(props: {
     .filter((n): n is string => n !== undefined)
 
   return (
-    <Modal
+    <Verktygsyta
+      yta="dialog"
       titel={t('Gruppera och summera')}
       underrubrik={frame.name}
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onStang}>
-            {t('Avbryt')}
-          </button>
-          <button
-            class="knapp knapp--primar"
-            disabled={utanBerakning || resultat.antalGrupper === 0}
-            title={
-              utanBerakning
-                ? t('Välj minst en sak att räkna ut.')
-                : resultat.antalGrupper === 0
-                  ? t('Det finns inga grupper att sammanfatta.')
-                  : undefined
-            }
-            onClick={() =>
-              props.onSkapa(
-                { ...resultat.frame, name: slutnamn },
-                tf(
-                  '{0} grupper ur {1}',
-                  formatCount(resultat.antalGrupper),
-                  rader(resultat.radermed),
-                ),
-              )
-            }
-          >
-            {t('Skapa fliken')}
-          </button>
-        </>
-      }
+      fot={{
+        primar: {
+          etikett: t('Skapa fliken'),
+          kan: !utanBerakning && resultat.antalGrupper > 0,
+          titel: utanBerakning
+            ? t('Välj minst en sak att räkna ut.')
+            : resultat.antalGrupper === 0
+              ? t('Det finns inga grupper att sammanfatta.')
+              : undefined,
+          kor: () =>
+            props.onSkapa(
+              { ...resultat.frame, name: slutnamn },
+              tf('{0} grupper ur {1}', formatCount(resultat.antalGrupper), rader(resultat.radermed)),
+            ),
+        },
+      }}
     >
       <div class="falt">
         <span class="falt__etikett">{t('Gruppera på')}</span>
@@ -414,6 +402,6 @@ export function GrupperaDialog(props: {
           'Resultatet blir en ny flik. Originalet rörs inte, och den nya fliken går att sortera, filtrera och exportera som vilken fil som helst. Steget kommer inte med i en profil — en profil kör om steg på samma fil, och det här skapar en annan.',
         )}
       </Notis>
-    </Modal>
+    </Verktygsyta>
   )
 }

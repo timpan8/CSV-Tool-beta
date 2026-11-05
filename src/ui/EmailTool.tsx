@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
-import { Verktygspanel } from './Verktygspanel.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import { Notis, Val } from './parts.js'
 import type { Column } from '../core/types.js'
 import { codeCounts } from '../core/frame/column.js'
@@ -97,25 +97,19 @@ export function EmailTool(props: {
   const exempel = inv.exempelNamn
 
   return (
-    <Verktygspanel
+    <Verktygsyta
+      yta="panel"
       titel={t('E-post')}
       underrubrik={col.name}
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onStang}>
-            {t('Avbryt')}
-          </button>
-          <button
-            class="knapp knapp--primar"
-            disabled={forh.andrade === 0}
-            title={forh.andrade === 0 ? t('Kolumnen skulle bli tom.') : undefined}
-            onClick={() => props.onTillampa([forh])}
-          >
-            {t(tva ? 'Skapa kolumnerna' : 'Skapa kolumnen')}
-          </button>
-        </>
-      }
+      fot={{
+        primar: {
+          etikett: t(tva ? 'Skapa kolumnerna' : 'Skapa kolumnen'),
+          kan: forh.andrade > 0,
+          titel: forh.andrade === 0 ? t('Kolumnen skulle bli tom.') : undefined,
+          kor: () => props.onTillampa([forh]),
+        },
+      }}
     >
       <div class="falt">
         <span class="falt__etikett">{t('Det här finns i kolumnen')}</span>
@@ -266,6 +260,6 @@ export function EmailTool(props: {
           )}
         </Notis>
       )}
-    </Verktygspanel>
+    </Verktygsyta>
   )
 }

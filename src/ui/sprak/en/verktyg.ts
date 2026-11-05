@@ -109,8 +109,6 @@ export const VERKTYG: Record<string, string> = {
   'Så många decimaler talet behöver. 980,00 blir 980.':
     'As many decimals as the number needs. 980,00 becomes 980.',
   'Värden som inte går att läsa som tal': 'Values that cannot be read as numbers',
-  'Värdet lämnas som det är.': 'The value is left as it is.',
-  'Gör raderna lätta att filtrera fram.': 'Makes the rows easy to filter out.',
   ' · {0} är inte tal': ' · {0} are not numbers',
   SUMMA: 'SUM',
   'Tusentalsavgränsare skrivs aldrig ut. De är till för att läsas av människor; ett tal i en fil ska kunna läsas av nästa program. Kolumnen typas som tal, vilket gör att {0} fungerar direkt i en Excel-export.':

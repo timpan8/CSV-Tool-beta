@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
-import { Resultat, Verktygspanel } from './Verktygspanel.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
+import { FELTILLSTAND, type Feltillstand } from './yta/feltillstand.js'
+import { Resultat } from './yta/Resultat.js'
 import { Notis, Val } from './parts.js'
 import type { Column } from '../core/types.js'
 import { samladOrdbok } from '../core/frame/column.js'
@@ -15,13 +17,7 @@ import { formatCount } from '../core/locale/sv.js'
 import { kolumnrubrik } from './verktyg.js'
 import { celler, sprak, t, tf, tj } from './sprak.js'
 
-type Feltillstand = 'behall' | 'tom' | 'markera'
 
-const FELTILLSTAND: { varde: Feltillstand; etikett: string; titel: string }[] = [
-  { varde: 'behall', etikett: 'Låt stå', titel: 'Värdet lämnas som det är.' },
-  { varde: 'markera', etikett: 'Skriv OGILTIGT', titel: 'Gör raderna lätta att filtrera fram.' },
-  { varde: 'tom', etikett: 'Töm cellen', titel: 'Tar bort värdet helt.' },
-]
 
 const LANDSNUMMER = [
   { varde: '46', etikett: 'Sverige +46' },
@@ -84,25 +80,19 @@ export function PhoneTool(props: {
   useEffect(() => () => props.onForhandsvisning(null), [])
 
   return (
-    <Verktygspanel
+    <Verktygsyta
+      yta="panel"
       titel={t('Telefon')}
       underrubrik={kolumnrubrik(kolumner)}
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onStang}>
-            {t('Avbryt')}
-          </button>
-          <button
-            class="knapp knapp--primar"
-            disabled={forh.andrade === 0}
-            title={forh.andrade === 0 ? t('Ingenting skulle ändras.') : undefined}
-            onClick={() => props.onTillampa(forhLista)}
-          >
-            {kolumner.length > 1 ? tf('Tillämpa på {0} kolumner', kolumner.length) : t('Tillämpa')}
-          </button>
-        </>
-      }
+      fot={{
+        primar: {
+          etikett: kolumner.length > 1 ? tf('Tillämpa på {0} kolumner', kolumner.length) : t('Tillämpa'),
+          kan: forh.andrade > 0,
+          titel: forh.andrade === 0 ? t('Ingenting skulle ändras.') : undefined,
+          kor: () => props.onTillampa(forhLista),
+        },
+      }}
     >
       <div class="falt">
         <span class="falt__etikett">{t('Det här finns i kolumnen')}</span>
@@ -183,6 +173,6 @@ export function PhoneTool(props: {
           <code>+46 70 123 45 67</code>,
         )}
       </Notis>
-    </Verktygspanel>
+    </Verktygsyta>
   )
 }

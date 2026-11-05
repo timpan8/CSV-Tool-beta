@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'preact/hooks'
-import { Verktygspanel } from './Verktygspanel.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import { Vardelista } from './Vardelista.js'
 import { utanEgenRegel } from './filterrader.js'
 import { Notis, Val } from './parts.js'
@@ -80,7 +80,8 @@ export function FilterTool(props: {
   )
 
   return (
-    <Verktygspanel
+    <Verktygsyta
+      yta="panel"
       titel={t('Filter')}
       underrubrik={
         aktiva.length === 0
@@ -92,20 +93,14 @@ export function FilterTool(props: {
             )
       }
       onStang={props.onStang}
-      fot={
-        <>
-          <button
-            class="knapp"
-            disabled={filter.regler.length === 0}
-            onClick={() => props.onFilter({ ...filter, regler: [] })}
-          >
-            {t('Ta bort alla regler')}
-          </button>
-          <button class="knapp knapp--primar" onClick={props.onStang}>
-            {t('Klar')}
-          </button>
-        </>
-      }
+      fot={{
+        sekundar: { etikett: t('Stäng'), kor: props.onStang },
+        destruktiv: {
+          etikett: t('Ta bort alla regler'),
+          kan: filter.regler.length > 0,
+          kor: () => props.onFilter({ ...filter, regler: [] }),
+        },
+      }}
     >
       {filter.regler.length > 1 && (
         <div class="falt">
@@ -292,6 +287,6 @@ export function FilterTool(props: {
           )}
         </Notis>
       )}
-    </Verktygspanel>
+    </Verktygsyta>
   )
 }

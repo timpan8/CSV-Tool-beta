@@ -15,7 +15,8 @@ import {
 } from '../state/profiler.js'
 import type { Tab } from '../state/store.js'
 import { formatCount } from '../core/locale/sv.js'
-import { Modal, Notis } from './parts.js'
+import { Notis } from './parts.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import { kolumner as kolumnerText, t, tf, tj } from './sprak.js'
 
 /**
@@ -89,23 +90,19 @@ export function ProfilDialog(props: { tab: Tab; onStang: () => void }) {
   }
 
   return (
-    <Modal
+    <Verktygsyta
+      yta="dialog"
       titel={t('Profiler')}
       underrubrik={props.tab.frame.name}
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={laddaNer} disabled={profiler.value.length === 0}>
-            {t('Spara till fil')}
-          </button>
-          <button class="knapp" onClick={() => filinput.current?.click()}>
-            {t('Öppna profilfil…')}
-          </button>
-          <button class="knapp knapp--primar" onClick={props.onStang}>
-            {t('Stäng')}
-          </button>
-        </>
-      }
+      fot={{
+        // Dialogen har ingen åtgärd att bekräfta — profilerna sparas och körs
+        // inifrån listan — så Stäng är sekundär och inte en falsk primär.
+        extra: [
+          { etikett: t('Spara till fil'), kan: profiler.value.length > 0, kor: laddaNer },
+          { etikett: t('Öppna profilfil…'), kor: () => filinput.current?.click() },
+        ],
+      }}
     >
       <input
         ref={filinput}
@@ -201,7 +198,7 @@ export function ProfilDialog(props: { tab: Tab; onStang: () => void }) {
       </div>
 
       {rapport && <Rapport namn={rapport.profil} rader={rapport.rader} />}
-    </Modal>
+    </Verktygsyta>
   )
 }
 

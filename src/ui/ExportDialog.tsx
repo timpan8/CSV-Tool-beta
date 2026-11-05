@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'preact/hooks'
-import { Modal, Notis, Val } from './parts.js'
+import { Notis, Val } from './parts.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import type { Delimiter, Encoding, Frame } from '../core/types.js'
 import {
   EXCEL_FRIENDLY,
@@ -115,23 +116,15 @@ export function ExportDialog(props: {
   }
 
   return (
-    <Modal
+    <Verktygsyta
+      yta="dialog"
       titel={t('Exportera')}
       underrubrik={`${tf('{0} rader', formatCount(urval.rows.length))} · ${tf(
         '{0} kolumner',
         formatCount(urval.columns.length),
       )}`}
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onStang}>
-            {t('Avbryt')}
-          </button>
-          <button class="knapp knapp--primar" onClick={() => void spara()}>
-            {t('Ladda ner')}
-          </button>
-        </>
-      }
+      fot={{ primar: { etikett: t('Ladda ner'), kor: () => void spara() } }}
     >
       <div class="falt">
         <span class="falt__etikett">{t('Format')}</span>
@@ -302,7 +295,7 @@ export function ExportDialog(props: {
           <pre class="fortab__ra">{exempelrad || t('(inga rader att exportera)')}</pre>
         </div>
       )}
-    </Modal>
+    </Verktygsyta>
   )
 }
 
