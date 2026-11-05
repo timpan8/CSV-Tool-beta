@@ -606,12 +606,14 @@ window.GUIDE_EN = {
         },
         {
           id: 'installningar', t: 'Language, theme and toolbar', img: 'installningar.png', imgWidth: 360,
-          cap: 'The settings menu on the far right of the app row.',
-          lead: 'On the far right of the app row: the `SV | EN` language choice, light/dark mode and the settings gear.',
+          cap: 'The settings dialog, from the gear on the far right of the app row.',
+          lead: 'On the far right of the app row: the `SV | EN` language choice and the gear, which opens the settings. `Ctrl+,` does the same. The choices apply at once and are saved.',
           notes: [
-            '**Language** changes the labels only. Sorting is still Swedish, numbers are still written `1 240,50` and the date tool still reads `augusti` — otherwise the same file sorted in two languages would give two orders.',
             '**Theme** can follow the system, or be locked to light or dark.',
-            '**The toolbar** can sit as a row under the tabs or vertically to the left of the columns. The choice is saved.'
+            '**Density** sets the row height in the table: compact shows more rows on screen.',
+            '**The toolbar** can sit as a row under the tabs or vertically to the left of the columns.',
+            '**Language** changes the labels only. Sorting is still Swedish, numbers are still written `1 240,50` and the date tool still reads `augusti` — otherwise the same file sorted in two languages would give two orders.',
+            '**Storage** says whether saving works, and has *Forget saved files* and *Start over…*. **About** shows the version.'
           ]
         }
       ]

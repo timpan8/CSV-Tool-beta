@@ -419,8 +419,9 @@ for (const sprak of SPRAK) {
     test('inställningar', async ({ page }) => {
       await oppnaExempel(page)
       await page.getByRole('button', { name: L('Inställningar'), exact: true }).click()
-      await expect(meny(page)).toBeVisible()
-      await bild(page, meny(page), 'installningar')
+      const dialog = page.getByRole('dialog', { name: L('Inställningar') })
+      await expect(dialog).toBeVisible()
+      await bild(page, dialog, 'installningar')
     })
   })
 }

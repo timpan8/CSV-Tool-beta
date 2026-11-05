@@ -2,7 +2,6 @@ import type { ColumnId } from '../../core/types.js'
 import { fargToken } from '../../core/frame/farg.js'
 import { STADNINGAR } from '../../core/ops/clean.js'
 import type { Riktning } from '../../core/ops/sort.js'
-import { theme, verktygsfalt } from '../../state/store.js'
 import type { Sessionslage } from '../../state/matchning.js'
 import { FARGER, fargetikett } from '../fargetikett.js'
 import type { MenyPost } from '../parts.jsx'
@@ -257,48 +256,3 @@ export function kolumnMeny(
     { etikett: t('Ta bort kolumnen'), fara: true, kor: () => handlers.taBort(id) },
   ]
 }
-
-/*
- * Inställningsmenyn. Tema finns här av ett skäl som sol/måne-knappen inte
- * löser: den växlar bara ljust ↔ mörkt och kan aldrig återgå till *följer
- * systemet*, fast det värdet finns. Språket står inte här — det ska synas i
- * hörnet, det var hela poängen med att flytta det dit.
- */
-export const installningsmeny = (): (MenyPost | 'avdelare')[] => [
-  {
-    etikett: t('Verktygsfält: som rad'),
-    aktiv: verktygsfalt.value === 'rad',
-    kor: () => {
-      verktygsfalt.value = 'rad'
-    },
-  },
-  {
-    etikett: t('Verktygsfält: lodrätt'),
-    aktiv: verktygsfalt.value === 'lodrat',
-    kor: () => {
-      verktygsfalt.value = 'lodrat'
-    },
-  },
-  'avdelare',
-  {
-    etikett: t('Tema: följer systemet'),
-    aktiv: theme.value === 'system',
-    kor: () => {
-      theme.value = 'system'
-    },
-  },
-  {
-    etikett: t('Tema: ljust'),
-    aktiv: theme.value === 'light',
-    kor: () => {
-      theme.value = 'light'
-    },
-  },
-  {
-    etikett: t('Tema: mörkt'),
-    aktiv: theme.value === 'dark',
-    kor: () => {
-      theme.value = 'dark'
-    },
-  },
-]

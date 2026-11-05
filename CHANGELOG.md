@@ -7,6 +7,9 @@ samma kod gått till [CSV-Tool](https://github.com/timpan8/CSV-Tool).
 ## [Ej släppt]
 
 ### Tillagt
+- Inställningarna är en dialog (kugghjulet eller `Ctrl+,`): tema, täthet, verktygsfält, språk, lagring
+  och version på ett ställe. Tätheten gick förut inte att ändra alls. Sol/måne-knappen i app-raden är
+  borta; temat väljs i dialogen eller växlas från paletten.
 - `Ctrl+X` klipper ut markeringen och `Ctrl+A` markerar allt. Båda står i cellmenyn och i paletten, och
   genvägarna där kommer nu ur samma lista som tangentbordet lyssnar på. Gör om går också med `Ctrl+Skift+Z`.
 

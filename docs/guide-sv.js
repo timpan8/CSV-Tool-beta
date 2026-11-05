@@ -606,12 +606,14 @@ window.GUIDE_SV = {
         },
         {
           id: 'installningar', t: 'Språk, tema och verktygsfält', img: 'installningar.png', imgWidth: 360,
-          cap: 'Inställningsmenyn längst till höger i app-raden.',
-          lead: 'Längst till höger i app-raden: språkvalet `SV | EN`, ljust/mörkt läge och kugghjulet.',
+          cap: 'Inställningsdialogen, från kugghjulet längst till höger i app-raden.',
+          lead: 'Längst till höger i app-raden: språkvalet `SV | EN` och kugghjulet, som öppnar inställningarna. `Ctrl+,` gör detsamma. Valen slår igenom direkt och sparas.',
           notes: [
-            '**Språk** byter bara etiketterna. Sorteringen är fortfarande svensk, tal skrivs fortfarande `1 240,50` och datumverktyget läser fortfarande `augusti` — annars hade samma fil sorterad på två språk gett två ordningar.',
             '**Tema** kan följa systemet, eller låsas till ljust eller mörkt.',
-            '**Verktygsfältet** kan ligga som en rad under flikarna eller lodrätt till vänster om kolumnerna. Valet sparas.'
+            '**Täthet** styr radhöjden i tabellen: kompakt visar fler rader på skärmen.',
+            '**Verktygsfältet** kan ligga som en rad under flikarna eller lodrätt till vänster om kolumnerna.',
+            '**Språk** byter bara etiketterna. Sorteringen är fortfarande svensk, tal skrivs fortfarande `1 240,50` och datumverktyget läser fortfarande `augusti` — annars hade samma fil sorterad på två språk gett två ordningar.',
+            '**Lagring** säger om sparningen fungerar, och har *Glöm sparade filer* och *Börja om…*. Under **Om** står versionen.'
           ]
         }
       ]

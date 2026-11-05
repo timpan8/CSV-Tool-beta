@@ -59,6 +59,7 @@ function handlare(): { h: Kommandohandlare; korda: string[] } {
     vaxlaTema: r('vaxlaTema'),
     vaxlaSprak: r('vaxlaSprak'),
     vaxlaVerktygsfalt: r('vaxlaVerktygsfalt'),
+    installningar: r('installningar'),
     glomSparat: r('glomSparat'),
     borjaOm: r('borjaOm'),
   }
@@ -89,6 +90,7 @@ describe('byggKommandon', () => {
       'klistrasomfil',
       'glomsparat',
       'borjaom',
+      'installningar',
       'tema',
       'sprak',
       'verktygsfalt',
