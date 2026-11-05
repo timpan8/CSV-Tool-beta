@@ -6,6 +6,7 @@ import {
   type SerializedFrame,
 } from '../core/frame/serialize.js'
 import type { Frame } from '../core/types.js'
+import { LAGRINGSPREFIX } from '../version.js'
 
 /**
  * Flikarna överlever en omladdning.
@@ -30,7 +31,7 @@ import type { Frame } from '../core/types.js'
  * en hackighet som inte behöver finnas.
  */
 
-const DB = 'csv-verkstan'
+const DB = LAGRINGSPREFIX
 const RAMAR = 'ramar'
 const FLIKAR = 'flikar'
 const SESSIONER = 'sessioner'

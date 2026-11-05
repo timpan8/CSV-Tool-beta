@@ -243,6 +243,7 @@ export const SKAL: Record<string, string> = {
   'Fyll en mall med data…': 'Fill a template with data…',
   'En fil med bara rubriker bestämmer formen, data hämtas ur de filer du väljer.':
     'A file with headers only sets the shape; the data is taken from the files you choose.',
+  'Det här är betaversionen. Klicka för den stabila.': 'This is the beta version. Click for the stable one.',
   'Spara den här filens arbetsgång och kör om den på nästa fil.':
     'Save this file’s steps and run them again on the next file.',
   'Glöm sparade filer': 'Forget saved files',

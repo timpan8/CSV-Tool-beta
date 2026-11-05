@@ -1,6 +1,12 @@
 import { expect, type Page } from '@playwright/test'
 
 /**
+ * Databasens namn följer kanalen, precis som i `src/version.ts`. Testerna
+ * körs mot bygget, och bygget får sitt prefix av samma miljövariabel.
+ */
+export const DBNAMN = process.env.VITE_KANAL === 'beta' ? 'csv-verkstan-beta' : 'csv-verkstan'
+
+/**
  * Läser hela lagringen som en söksträng, utan att skapa databasen.
  *
  * Ett versionslöst `open` mot en databas som inte finns skulle skapa den på
@@ -9,11 +15,11 @@ import { expect, type Page } from '@playwright/test'
  * först, och en databas som saknas rapporteras som null i stället.
  */
 export async function sparatInnehall(page: Page): Promise<string | null> {
-  return page.evaluate(async () => {
+  return page.evaluate(async (namn) => {
     const dbs = await indexedDB.databases()
-    if (!dbs.some((d) => d.name === 'csv-verkstan')) return null
+    if (!dbs.some((d) => d.name === namn)) return null
     const db = await new Promise<IDBDatabase | null>((ok) => {
-      const b = indexedDB.open('csv-verkstan')
+      const b = indexedDB.open(namn)
       b.onsuccess = () => ok(b.result)
       b.onerror = () => ok(null)
     })
@@ -32,7 +38,7 @@ export async function sparatInnehall(page: Page): Promise<string | null> {
     } finally {
       db.close()
     }
-  })
+  }, DBNAMN)
 }
 
 /**

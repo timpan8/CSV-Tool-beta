@@ -339,6 +339,33 @@ input[type='radio'] {
   margin-right: 6px;
 }
 
+.verktygsrad__kanal {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--varning-svag);
+  color: var(--text);
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.verktygsrad__kanal:hover {
+  text-decoration: underline;
+}
+
+.verktygsrad__version {
+  font-weight: 450;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-svag);
+}
+
 .verktygsrad__logga {
   width: 20px;
   height: 20px;

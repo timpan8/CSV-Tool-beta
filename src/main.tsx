@@ -11,11 +11,14 @@ import './styles/pivot.css'
 import { App } from './ui/App.jsx'
 import { applyAppearance } from './state/store.js'
 import { tillampaSprak } from './ui/sprak.js'
+import { KANAL } from './version.js'
 
 applyAppearance()
 // `lang` på dokumentet från start, så att skärmläsaren och webbläsarens egen
 // stavningskontroll vet vilket språk sidan är på innan något ritats.
 tillampaSprak()
+// Betan heter beta också i webbläsarens flik, så att två öppna utgåvor går att skilja åt.
+if (KANAL === 'beta') document.title = 'CSV-verkstan beta'
 
 const root = document.getElementById('app')
 if (!root) throw new Error('Hittade inte #app i dokumentet.')

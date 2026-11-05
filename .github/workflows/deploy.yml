@@ -27,6 +27,11 @@ jobs:
   kontrollera:
     name: Typkontroll, tester och bygge
     runs-on: ubuntu-latest
+    env:
+      # Det här är beta-repot. Flaggan ger bygget sitt beta-märke och egna
+      # lagringsnycklar, och gäller även röktestet så att det testar samma
+      # bygge som publiceras. Se src/version.ts.
+      VITE_KANAL: beta
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7

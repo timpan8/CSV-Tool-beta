@@ -1,4 +1,5 @@
 import { cp, rename } from 'node:fs/promises'
+import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
 
@@ -75,7 +76,11 @@ function anvandarguiden(): Plugin {
   }
 }
 
+/** Versionen läses ur package.json en gång, så att den aldrig behöver skrivas på två ställen. */
+const VERSION = (JSON.parse(readFileSync('package.json', 'utf8')) as { version: string }).version
+
 export default defineConfig({
+  define: { __VERSION__: JSON.stringify(VERSION) },
   plugins: [contentSecurityPolicy(), anvandarguiden()],
   // Relativ bas gör bygget sökvägsoberoende: det fungerar på GitHub Pages
   // under /CSV-Tool/ lika väl som på ett eget domännamn, utan att sökvägen

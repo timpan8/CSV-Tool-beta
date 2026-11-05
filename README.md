@@ -1,5 +1,11 @@
 # CSV-verkstan
 
+> **Det här är beta-repot.** Här byggs nästa version av [CSV-Tool](https://github.com/timpan8/CSV-Tool),
+> och betan publiceras på <https://timpan8.github.io/CSV-Tool-beta/>. Den stabila utgåvan finns på
+> <https://timpan8.github.io/CSV-Tool/>. Betan sparar sina flikar under egna nycklar och rör aldrig den
+> stabila utgåvans data. Hur de två hänger ihop står i [docs/UTVECKLING.md](docs/UTVECKLING.md), och vad
+> som är på gång i [docs/GRANSKNING-2026-11.md](docs/GRANSKNING-2026-11.md) och [CHANGELOG.md](CHANGELOG.md).
+
 Ett webbaserat verktyg för att läsa in, städa, matcha och exportera CSV- och Excel-data. Det körs **helt i webbläsaren** — ingen fil laddas upp någonstans.
 
 ![Skärmbild av CSV-verkstan med en öppnad exempelfil](docs/skarmbild.png)

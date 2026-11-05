@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import {
+  DBNAMN,
   markeraForeOmladdning,
   sparatInnehall,
   vantaPaBorttaget,
@@ -128,14 +129,14 @@ test('en uppgradering av databasen kastar inte det som redan är sparat', async 
    * som en oaktsam versionshöjning hade tömt: `onupgradeneeded` raderade förut
    * alla butiker, och radfiltret hade dessutom kastat resten.
    */
-  const byggd = await page.evaluate(async () => {
+  const byggd = await page.evaluate(async (namn) => {
     const las = <T,>(r: IDBRequest<T>) =>
       new Promise<T>((ok, no) => {
         r.onsuccess = () => ok(r.result)
         r.onerror = () => no(r.error)
       })
     const v2 = await new Promise<IDBDatabase>((ok) => {
-      const b = indexedDB.open('csv-verkstan')
+      const b = indexedDB.open(namn)
       b.onsuccess = () => ok(b.result)
     })
     const tx = v2.transaction(['ramar', 'flikar'], 'readonly')
@@ -145,13 +146,13 @@ test('en uppgradering av databasen kastar inte det som redan är sparat', async 
     if (ramar.length === 0) return 0
 
     await new Promise<void>((ok) => {
-      const d = indexedDB.deleteDatabase('csv-verkstan')
+      const d = indexedDB.deleteDatabase(namn)
       d.onsuccess = () => ok()
       d.onerror = () => ok()
       d.onblocked = () => ok()
     })
     const v1 = await new Promise<IDBDatabase>((ok) => {
-      const b = indexedDB.open('csv-verkstan', 1)
+      const b = indexedDB.open(namn, 1)
       b.onupgradeneeded = () => {
         b.result.createObjectStore('ramar', { keyPath: 'id' })
         b.result.createObjectStore('flikar', { keyPath: 'id' })
@@ -166,7 +167,7 @@ test('en uppgradering av databasen kastar inte det som redan är sparat', async 
     })
     v1.close()
     return ramar.length
-  })
+  }, DBNAMN)
   expect(byggd).toBe(1)
 
   // Nu öppnar appen samma databas på version 2 och måste lägga till sin nya
