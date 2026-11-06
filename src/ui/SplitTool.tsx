@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
-import { Resultat, Verktygspanel } from './Verktygspanel.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
+import { Resultat } from './yta/Resultat.js'
 import { Notis, Val } from './parts.js'
 import type { Column } from '../core/types.js'
 import { codeCounts } from '../core/frame/column.js'
@@ -152,34 +153,23 @@ export function SplitTool(props: {
   }
 
   return (
-    <Verktygspanel
+    <Verktygsyta
+      yta="panel"
       titel={t('Dela kolumn')}
       underrubrik={col.name}
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onStang}>
-            {t('Avbryt')}
-          </button>
-          <button
-            class="knapp knapp--primar"
-            disabled={forh.andrade === 0 || fel !== null}
-            title={
-              fel !== null
-                ? t(fel)
-                : forh.andrade === 0
-                  ? t('Delningen ger inga värden.')
-                  : undefined
-            }
-            onClick={() => {
-              if (armonster) anvandeMall({ sort: 'monster', text: monster })
-              props.onTillampa([forh])
-            }}
-          >
-            {tf('Skapa {0} kolumner', formatCount(faktisktAntal))}
-          </button>
-        </>
-      }
+      fot={{
+        primar: {
+          etikett: tf('Skapa {0} kolumner', formatCount(faktisktAntal)),
+          kan: forh.andrade > 0 && fel === null,
+          titel:
+            fel !== null ? t(fel) : forh.andrade === 0 ? t('Delningen ger inga värden.') : undefined,
+          kor: () => {
+            if (armonster) anvandeMall({ sort: 'monster', text: monster })
+            props.onTillampa([forh])
+          },
+        },
+      }}
     >
       <div class="falt">
         <span class="falt__etikett">{t('Dela')}</span>
@@ -341,7 +331,7 @@ export function SplitTool(props: {
           )}
         </Notis>
       )}
-    </Verktygspanel>
+    </Verktygsyta>
   )
 }
 

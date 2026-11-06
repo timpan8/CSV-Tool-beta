@@ -1548,6 +1548,16 @@ export function App() {
       }
 
       if (iFalt) return
+      // Enter och mellanslag på en knapp är knappens egen aktivering, inte
+      // rutnätets. Utan den här raden började Enter på *Exportera* redigera
+      // cellen i stället för att öppna dialogen.
+      if (
+        target &&
+        (target.tagName === 'BUTTON' || target.tagName === 'A') &&
+        !target.closest('[role=grid]')
+      ) {
+        return
+      }
 
       switch (e.key) {
         case 'ArrowUp':

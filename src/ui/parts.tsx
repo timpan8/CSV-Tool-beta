@@ -3,41 +3,6 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks'
 import { dismiss, toasts } from '../state/store.js'
 import { t, tf } from './sprak.js'
 
-export function Modal(props: {
-  titel: string
-  underrubrik?: string
-  onStang: () => void
-  fot: ComponentChildren
-  children: ComponentChildren
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') props.onStang()
-    }
-    window.addEventListener('keydown', onKey)
-    ref.current?.focus()
-    return () => window.removeEventListener('keydown', onKey)
-  }, [props.onStang])
-
-  return (
-    <div class="overlagg" onMouseDown={(e) => e.target === e.currentTarget && props.onStang()}>
-      <div class="modal" role="dialog" aria-modal="true" aria-label={props.titel} tabIndex={-1} ref={ref}>
-        <div class="modal__rubrik">
-          <h2>{props.titel}</h2>
-          {props.underrubrik && <span class="modal__underrubrik">{props.underrubrik}</span>}
-          <button class="modal__stang" onClick={props.onStang} aria-label={t('Stäng')}>
-            ✕
-          </button>
-        </div>
-        <div class="modal__kropp">{props.children}</div>
-        <div class="modal__fot">{props.fot}</div>
-      </div>
-    </div>
-  )
-}
-
 export interface MenyPost {
   etikett: string
   genvag?: string

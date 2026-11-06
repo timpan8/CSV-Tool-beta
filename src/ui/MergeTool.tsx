@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
-import { Resultat, Verktygspanel } from './Verktygspanel.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
+import { Resultat } from './yta/Resultat.js'
 import { Notis } from './parts.js'
 import type { Column, Frame } from '../core/types.js'
 import {
@@ -226,35 +227,28 @@ export function MergeTool(props: {
   const infoga = (kolumnnamn: string) => setMall((m) => `${m}{${kolumnnamn}}`)
 
   return (
-    <Verktygspanel
+    <Verktygsyta
+      yta="panel"
       titel={t('Bygg kolumn ur mall')}
       underrubrik={col.name}
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onStang}>
-            {t('Avbryt')}
-          </button>
-          <button
-            class="knapp knapp--primar"
-            disabled={forh.andrade === 0 || tolkningar.okanda.length > 0}
-            title={
-              tolkningar.okanda.length > 0
-                ? t('Mallen pekar på kolumner som inte finns.')
-                : forh.andrade === 0
-                  ? t('Kolumnen skulle bli tom.')
-                  : undefined
-            }
-            onClick={() => {
-              // Mallen räknas som använd när den körs, inte medan den skrivs.
-              anvandeMall(somSparad())
-              props.onTillampa([forh])
-            }}
-          >
-            {t('Skapa kolumnen')}
-          </button>
-        </>
-      }
+      fot={{
+        primar: {
+          etikett: t('Skapa kolumnen'),
+          kan: forh.andrade > 0 && tolkningar.okanda.length === 0,
+          titel:
+            tolkningar.okanda.length > 0
+              ? t('Mallen pekar på kolumner som inte finns.')
+              : forh.andrade === 0
+                ? t('Kolumnen skulle bli tom.')
+                : undefined,
+          kor: () => {
+            // Mallen räknas som använd när den körs, inte medan den skrivs.
+            anvandeMall(somSparad())
+            props.onTillampa([forh])
+          },
+        },
+      }}
     >
       <div class="falt">
         <span class="falt__etikett">{t('Mall')}</span>
@@ -434,7 +428,7 @@ export function MergeTool(props: {
           'Värdet räknas ut rad för rad, eftersom det beror på flera kolumner. På riktigt stora filer märks det som en kort fördröjning när du skriver i mallen.',
         )}
       </Notis>
-    </Verktygspanel>
+    </Verktygsyta>
   )
 }
 
