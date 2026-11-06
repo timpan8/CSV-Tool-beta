@@ -7,6 +7,8 @@ samma kod gått till [CSV-Tool](https://github.com/timpan8/CSV-Tool).
 ## [Ej släppt]
 
 ### Tillagt
+- Frågor som *Stänga filen?*, *Kasta arbetet?* och namnbyte på en kolumn är appens egna dialoger
+  i stället för webbläsarens rutor: de följer temat och språket, Enter bekräftar och Escape avbryter.
 - Inställningarna är en dialog (kugghjulet eller `Ctrl+,`): tema, täthet, verktygsfält, språk, lagring
   och version på ett ställe. Tätheten gick förut inte att ändra alls. Sol/måne-knappen i app-raden är
   borta; temat väljs i dialogen eller växlas från paletten.

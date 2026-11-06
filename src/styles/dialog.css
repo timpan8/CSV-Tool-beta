@@ -181,6 +181,15 @@
 }
 
 /* En förklarande rad under ett val: vad inställningen gör. */
+.modal--smal {
+  width: min(440px, calc(100vw - 32px));
+}
+
+.bekraftelse__text {
+  margin: 0;
+  line-height: 1.45;
+}
+
 .falt__hjalp {
   margin: 0;
   font-size: 12px;

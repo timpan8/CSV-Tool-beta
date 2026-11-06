@@ -115,8 +115,11 @@ test('en omdöpt källkolumn tar mallen med sig', async ({ page }) => {
   await oppnaExempel(page)
   await byggMallkolumn(page)
 
-  page.once('dialog', (d) => void d.accept('Kund'))
   await oppnaUrKolumnmenyn(page, 'Namn', 'Byt namn…')
+  // Namnbytet är appens egen dialog, inte webbläsarens.
+  const fraga = page.getByRole('dialog', { name: 'Byt namn på Namn' })
+  await fraga.getByRole('textbox').fill('Kund')
+  await fraga.getByRole('button', { name: 'Byt namn', exact: true }).click()
   await expect(page.locator('.rubrik[title="Kund"]')).toHaveCount(1)
 
   // Mallen läser den omdöpta kolumnen, alltså går den fortfarande att köra.

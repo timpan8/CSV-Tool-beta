@@ -1,3 +1,4 @@
+import { bekrafta } from '../../state/bekraftelse.js'
 import type { JSX } from 'preact'
 import type { Column } from '../../core/types.js'
 import {
@@ -32,7 +33,7 @@ import { Oversikt } from '../Oversikt.jsx'
 import { Felgrans } from '../parts.jsx'
 import { Pivot } from '../Pivot.jsx'
 import { SlaIhop } from '../SlaIhop.jsx'
-import { t } from '../sprak.js'
+import { t, tf } from '../sprak.js'
 import { Verkstad } from '../Verkstad.jsx'
 import type { Handlingar } from './handlingar.js'
 import { Hogerpanel } from './Hogerpanel.jsx'
@@ -112,7 +113,7 @@ export function Innehall({
           openFrame(resultat)
           notify(text)
         }}
-        onVerkstad={(vansterTabId, hogerTabId, par, val) => {
+        onVerkstad={async (vansterTabId, hogerTabId, par, val) => {
           const vansterTab = tabs.value.find((t) => t.id === vansterTabId)
           const hogerTab = tabs.value.find((t) => t.id === hogerTabId)
           if (!vansterTab || !hogerTab) return
@@ -126,9 +127,17 @@ export function Innehall({
           const ogjort = gamla ? ogjortArbete(gamla) : 0
           if (
             ogjort > 0 &&
-            !window.confirm(
-              `Den påbörjade sammanslagningen ${gamla!.vansterNamn} ↔ ${gamla!.hogerNamn} har ${ogjort} beslut som inte finns någon annanstans. Börja om ändå?`,
-            )
+            !(await bekrafta({
+              rubrik: t('Börja om sammanslagningen?'),
+              text: tf(
+                'Den påbörjade sammanslagningen {0} ↔ {1} har {2} beslut som inte finns någon annanstans.',
+                gamla!.vansterNamn,
+                gamla!.hogerNamn,
+                ogjort,
+              ),
+              ok: t('Börja om'),
+              fara: true,
+            }))
           ) {
             return
           }

@@ -10,6 +10,7 @@ import { Kommandopalett } from '../Kommandopalett.jsx'
 import { PasteDialog } from '../PasteDialog.jsx'
 import { ProfilDialog } from '../ProfilDialog.jsx'
 import { Installningar } from './Installningar.jsx'
+import { Bekraftelse } from '../Bekraftelse.jsx'
 import { celler, t, tf } from '../sprak.js'
 import type { Handlingar } from './handlingar.js'
 import type { SkalLage } from './lage.js'
@@ -40,6 +41,7 @@ export function Dialoger({ s, h, begransad }: { s: SkalLage; h: Handlingar; begr
   const { laddaFil, klistraInSomNyFil } = h
   return (
     <>
+      <Bekraftelse />
       {installningarOppna && (
         <Installningar
           onStang={() => setInstallningarOppna(false)}
