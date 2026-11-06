@@ -54,15 +54,21 @@ for (const sprak of SPRAK) {
     test.use({ viewport: { width: 1400, height: 1080 }, deviceScaleFactor: 1 })
 
     test.beforeEach(async ({ context }) => {
-      await context.addInitScript((valt: Sprak) => {
-        try {
-          localStorage.setItem('csv-verkstan.sprak', valt)
-        } catch {
-          // Blockerad lagring — appen faller tillbaka på svenska, och
-          // bildtagningen upptäcker det på nästa svenska etikett den letar
-          // efter i ett gränssnitt som skulle varit engelskt.
-        }
-      }, sprak)
+      // Nyckeln följer kanalen, som i `src/version.ts`: betan sparar under
+      // ett eget prefix, och bilderna tas av det bygge som ska publiceras.
+      const nyckel = `${process.env.VITE_KANAL === 'beta' ? 'csv-verkstan-beta' : 'csv-verkstan'}.sprak`
+      await context.addInitScript(
+        ({ nyckel, valt }: { nyckel: string; valt: Sprak }) => {
+          try {
+            localStorage.setItem(nyckel, valt)
+          } catch {
+            // Blockerad lagring — appen faller tillbaka på svenska, och
+            // bildtagningen upptäcker det på nästa svenska etikett den letar
+            // efter i ett gränssnitt som skulle varit engelskt.
+          }
+        },
+        { nyckel, valt: sprak },
+      )
     })
 
     /* ---------- Bildtagning ---------- */
