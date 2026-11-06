@@ -6,6 +6,10 @@ samma kod gått till [CSV-Tool](https://github.com/timpan8/CSV-Tool).
 
 ## [Ej släppt]
 
+### Tillagt
+- `Ctrl+X` klipper ut markeringen och `Ctrl+A` markerar allt. Båda står i cellmenyn och i paletten, och
+  genvägarna där kommer nu ur samma lista som tangentbordet lyssnar på. Gör om går också med `Ctrl+Skift+Z`.
+
 ## [0.2.0-beta.1] – 2026-11-05
 
 Första betan. Samma kod som CSV-Tool 0.1.0 plus beta-identiteten.

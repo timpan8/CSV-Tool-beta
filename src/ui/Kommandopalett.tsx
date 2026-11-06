@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { sokKommandon, type Kommando } from './kommandon.js'
 import { t, tf } from './sprak.js'
+import { visaGenvag } from './kommandon/genvagar.js'
 
 /**
  * Kommandopaletten.
@@ -121,7 +122,7 @@ export function Kommandopalett(props: { kommandon: readonly Kommando[]; onStang:
                 >
                   <span class="palett__etikett">{k.etikett}</span>
                   {k.beskrivning && <span class="palett__text">{k.beskrivning}</span>}
-                  {k.genvag && <span class="palett__genvag">{k.genvag}</span>}
+                  {k.genvag && <span class="palett__genvag">{visaGenvag(k.genvag)}</span>}
                 </button>
               </div>
             )

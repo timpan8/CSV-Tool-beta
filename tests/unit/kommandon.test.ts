@@ -14,6 +14,12 @@ function handlare(): { h: Kommandohandlare; korda: string[] } {
   const h: Kommandohandlare = {
     oppnaFil: r('oppnaFil'),
     klistraSomFil: r('klistraSomFil'),
+    klippUt: r('klippUt'),
+    kopiera: r('kopiera'),
+    klistraIn: r('klistraIn'),
+    fyllNedat: r('fyllNedat'),
+    tomMarkering: r('tomMarkering'),
+    markeraAllt: r('markeraAllt'),
     exportera: r('exportera'),
     profiler: r('profiler'),
     sok: r('sok'),

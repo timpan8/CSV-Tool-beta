@@ -265,6 +265,12 @@ export const SKAL: Record<string, string> = {
   'Filtrera på {0}…': 'Filter on {0}…',
   'Visa ogiltiga värden i {0}': 'Show invalid values in {0}',
   'Byt ljust eller mörkt läge': 'Switch light or dark mode',
+  Skift: 'Shift',
+  Markering: 'Selection',
+  'Markera allt': 'Select all',
+  'Inte tillgängligt just nu.': 'Not available right now.',
+  'Skriver in det du kopierat i tabellen, från den markerade cellen.':
+    'Writes what you copied into the table, starting at the selected cell.',
   'Byt språk till engelska': 'Switch language to Swedish',
   'Gränssnittets text byter språk. Sortering, tal och datum följer alltid svenska regler.':
     'The interface text changes language. Sorting, numbers and dates always follow Swedish rules.',
