@@ -1,4 +1,5 @@
 import { render } from 'preact'
+import { effect } from '@preact/signals'
 import './styles/tokens.css'
 import './styles/base.css'
 import './styles/grid.css'
@@ -13,7 +14,13 @@ import { applyAppearance } from './state/store.js'
 import { tillampaSprak } from './ui/sprak.js'
 import { KANAL } from './version.js'
 
-applyAppearance()
+/*
+ * Utseendet följer signalerna synkront: ett byte av tema eller täthet
+ * skriver attributet på roten i samma ögonblick, innan nästa ritning. Så
+ * kan rutnätet mäta om sin radhöjd i sin layout-effekt och lita på att
+ * variabeln redan bytt värde.
+ */
+effect(applyAppearance)
 // `lang` på dokumentet från start, så att skärmläsaren och webbläsarens egen
 // stavningskontroll vet vilket språk sidan är på innan något ritats.
 tillampaSprak()
