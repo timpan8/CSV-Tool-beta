@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
-import { Verktygspanel } from './Verktygspanel.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
+import { FELTILLSTAND, type Feltillstand } from './yta/feltillstand.js'
 import { Notis, Val } from './parts.js'
 import type { Column } from '../core/types.js'
 import { samladOrdbok } from '../core/frame/column.js'
@@ -9,7 +10,6 @@ import {
   datumTransform,
   inventera,
   tolkaDatum,
-  type Feltillstand,
   type Malformat,
 } from '../core/ops/dates.js'
 import { beraknaForhandsvisning, sammanfatta, type Forhandsvisning } from '../state/preview.js'
@@ -17,15 +17,6 @@ import { formatCount } from '../core/locale/sv.js'
 import { kolumnrubrik } from './verktyg.js'
 import { celler, sprak, t, tf, tj } from './sprak.js'
 
-const FELTILLSTAND: { varde: Feltillstand; etikett: string; titel: string }[] = [
-  {
-    varde: 'behall',
-    etikett: 'Låt stå',
-    titel: 'Värdet lämnas precis som det är. Du ser själv vilka rader som behöver ses över.',
-  },
-  { varde: 'markera', etikett: 'Skriv OGILTIGT', titel: 'Gör raderna lätta att filtrera fram efteråt.' },
-  { varde: 'tom', etikett: 'Töm cellen', titel: 'Tar bort värdet helt.' },
-]
 
 /**
  * Datumverktyget.
@@ -147,35 +138,27 @@ export function DateTool(props: {
     '03/04/2026'
 
   return (
-    <Verktygspanel
+    <Verktygsyta
+      yta="panel"
       titel={t('Datum')}
       underrubrik={kolumnrubrik(kolumner)}
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onStang}>
-            {t('Avbryt')}
-          </button>
-          <button
-            class="knapp knapp--primar"
-            disabled={forh.andrade === 0 || maasteSvara}
-            title={
-              maasteSvara
-                ? t('Svara först på om dagen eller månaden står först.')
-                : forh.andrade === 0
-                  ? t(nyKolumn ? 'Kolumnen skulle bli tom.' : 'Ingenting skulle ändras.')
-                  : undefined
-            }
-            onClick={() => props.onTillampa(forhLista)}
-          >
-            {nyKolumn
-              ? t('Skapa kolumnen')
-              : kolumner.length > 1
-                ? tf('Tillämpa på {0} kolumner', kolumner.length)
-                : t('Tillämpa')}
-          </button>
-        </>
-      }
+      fot={{
+        primar: {
+          etikett: nyKolumn
+            ? t('Skapa kolumnen')
+            : kolumner.length > 1
+              ? tf('Tillämpa på {0} kolumner', kolumner.length)
+              : t('Tillämpa'),
+          kan: forh.andrade > 0 && !maasteSvara,
+          titel: maasteSvara
+            ? t('Svara först på om dagen eller månaden står först.')
+            : forh.andrade === 0
+              ? t(nyKolumn ? 'Kolumnen skulle bli tom.' : 'Ingenting skulle ändras.')
+              : undefined,
+          kor: () => props.onTillampa(forhLista),
+        },
+      }}
     >
       <div class="falt">
         <span class="falt__etikett">{t('Det här finns i kolumnen')}</span>
@@ -370,6 +353,6 @@ export function DateTool(props: {
               <span class="forhand__efter">{t('efter')}</span>,
             )}
       </Notis>
-    </Verktygspanel>
+    </Verktygsyta>
   )
 }

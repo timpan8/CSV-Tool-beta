@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
-import { Modal, Notis } from './parts.js'
+import { Notis } from './parts.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import { formatByte } from '../core/locale/sv.js'
 import { omstartslage, type Omstartslage } from '../state/store.js'
 import { sessionslage, type Sessionslage } from '../state/matchning.js'
@@ -35,20 +36,14 @@ export function BorjaOmDialog(props: { onAvbryt: () => void; onBorjaOm: () => vo
     lage !== null && (lage.filer > 0 || session.lage !== 'ingen' || (lage.lagrat ?? 0) > 0)
 
   return (
-    <Modal
+    <Verktygsyta
+      yta="dialog"
       titel={t('Börja om')}
       underrubrik={t('Stänger allt och tömmer webbläsarens lagring')}
       onStang={props.onAvbryt}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onAvbryt}>
-            {t('Avbryt')}
-          </button>
-          <button class="knapp knapp--fara" onClick={props.onBorjaOm} disabled={lage === null}>
-            {t('Rensa allt')}
-          </button>
-        </>
-      }
+      fot={{
+        primar: { etikett: t('Rensa allt'), fara: true, kan: lage !== null, kor: props.onBorjaOm },
+      }}
     >
       {lage !== null && lage.osparade > 0 && (
         <Notis ton="varning">
@@ -121,6 +116,6 @@ export function BorjaOmDialog(props: { onAvbryt: () => void; onBorjaOm: () => vo
           'Sidan laddas om till sist. Det är det som gör att webbläsaren faktiskt lämnar tillbaka minnet; att bara stänga flikarna räcker inte, eftersom den själv bestämmer när den städar.',
         )}
       </Notis>
-    </Modal>
+    </Verktygsyta>
   )
 }

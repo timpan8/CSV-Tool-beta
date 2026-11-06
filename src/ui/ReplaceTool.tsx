@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
-import { Verktygspanel } from './Verktygspanel.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import { Notis } from './parts.js'
 import type { Column } from '../core/types.js'
 import { TOM_ERSATTNING, byggErsattare, type Ersattning } from '../core/ops/replace.js'
@@ -70,25 +70,19 @@ export function ReplaceTool(props: {
   }, [])
 
   return (
-    <Verktygspanel
+    <Verktygsyta
+      yta="panel"
       titel={t('Sök och ersätt')}
       underrubrik={kolumnrubrik(kolumner)}
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onStang}>
-            {t('Avbryt')}
-          </button>
-          <button
-            class="knapp knapp--primar"
-            disabled={forh === null || forh.andrade === 0}
-            title={forh !== null && forh.andrade === 0 ? t('Ingenting träffas.') : undefined}
-            onClick={() => forh && props.onTillampa(forhLista)}
-          >
-            {kolumner.length > 1 ? tf('Ersätt i {0} kolumner', kolumner.length) : t('Ersätt')}
-          </button>
-        </>
-      }
+      fot={{
+        primar: {
+          etikett: kolumner.length > 1 ? tf('Ersätt i {0} kolumner', kolumner.length) : t('Ersätt'),
+          kan: forh !== null && forh.andrade > 0,
+          titel: forh !== null && forh.andrade === 0 ? t('Ingenting träffas.') : undefined,
+          kor: () => forh && props.onTillampa(forhLista),
+        },
+      }}
     >
       <div class="falt">
         <span class="falt__etikett">{t('Sök efter')}</span>
@@ -213,7 +207,7 @@ export function ReplaceTool(props: {
           </button>
         </div>
       </div>
-    </Verktygspanel>
+    </Verktygsyta>
   )
 }
 

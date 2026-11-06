@@ -1,4 +1,5 @@
-import { Modal, Notis } from './parts.js'
+import { Notis } from './parts.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import { formatCount } from '../core/locale/sv.js'
 import { serUtSomRubrikrad } from '../core/csv/parse.js'
 import type { PasteRequest } from '../state/edits.js'
@@ -34,38 +35,32 @@ export function PasteDialog(props: {
   const harRubriker = serUtSomRubrikrad(plan.rader)
 
   return (
-    <Modal
+    <Verktygsyta
+      yta="dialog"
       titel={t('Klistra in')}
       underrubrik={`${raderText(plan.rader.length)} × ${kolumnerText(bredd)}`}
       onStang={props.onAvbryt}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onAvbryt}>
-            {t('Avbryt')}
-          </button>
-          {/*
-            Att det inklistrade inte får plats är det tydligaste tecknet på
-            att det kanske aldrig var tänkt för den här tabellen. Då ska
-            valet stå här, bredvid de andra, och inte kräva att man avbryter
-            och letar reda på en genväg.
-          */}
-          <button
-            class={`knapp${harRubriker ? ' knapp--primar' : ''}`}
-            onClick={props.onNyFil}
-          >
-            {t('Öppna som ny fil')}
-          </button>
-          <button class="knapp" onClick={() => props.onKlistraIn(false)}>
-            {t('Klipp av')}
-          </button>
-          <button
-            class={`knapp${harRubriker ? '' : ' knapp--primar'}`}
-            onClick={() => props.onKlistraIn(true)}
-          >
-            {t('Lägg till plats')}
-          </button>
-        </>
-      }
+      fot={{
+        /*
+         * Att det inklistrade inte får plats är det tydligaste tecknet på
+         * att det kanske aldrig var tänkt för den här tabellen. Då ska
+         * valet stå här, bredvid de andra, och inte kräva att man avbryter
+         * och letar reda på en genväg. Ser det ut som en hel tabell med
+         * rubriker är ny fil det primära valet, annars att göra plats.
+         */
+        primar: harRubriker
+          ? { etikett: t('Öppna som ny fil'), kor: props.onNyFil }
+          : { etikett: t('Lägg till plats'), kor: () => props.onKlistraIn(true) },
+        extra: harRubriker
+          ? [
+              { etikett: t('Klipp av'), kor: () => props.onKlistraIn(false) },
+              { etikett: t('Lägg till plats'), kor: () => props.onKlistraIn(true) },
+            ]
+          : [
+              { etikett: t('Öppna som ny fil'), kor: props.onNyFil },
+              { etikett: t('Klipp av'), kor: () => props.onKlistraIn(false) },
+            ],
+      }}
     >
       <Notis ton={harRubriker ? 'info' : 'varning'}>
         {harRubriker
@@ -119,6 +114,6 @@ export function PasteDialog(props: {
           </table>
         </div>
       </div>
-    </Modal>
+    </Verktygsyta>
   )
 }
