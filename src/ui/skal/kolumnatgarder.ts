@@ -1,3 +1,4 @@
+import { fragaText } from '../../state/bekraftelse.js'
 import type { ColumnId, ColumnType } from '../../core/types.js'
 import {
   columnIndex,
@@ -111,11 +112,15 @@ export function useKolumnatgarder({ tab, frame }: Pick<SkalLage, 'tab' | 'frame'
     })
   }
 
-  const dopOmKolumn = (id: ColumnId) => {
+  const dopOmKolumn = async (id: ColumnId) => {
     if (!frame) return
     const col = findColumn(frame, id)
     if (!col) return
-    const svar = window.prompt(`Nytt namn för kolumnen ”${col.name}”`, col.name)
+    const svar = await fragaText({
+      rubrik: tf('Byt namn på {0}', col.name),
+      falt: { etikett: t('Nytt namn'), varde: col.name },
+      ok: t('Byt namn'),
+    })
     if (svar === null) return
     const nytt = uniqueColumnName(
       frame.columns.filter((c) => c.id !== id).map((c) => c.name),

@@ -1,18 +1,14 @@
-import { useEffect } from 'preact/hooks'
 import type { Column } from '../../core/types.js'
 import { findColumn } from '../../core/frame/frame.js'
 import { TOMT_FILTER } from '../../core/ops/filter.js'
 import { beskrivSortering } from '../../core/ops/sort.js'
 import {
-  applyAppearance,
   clearViewSpec,
   rensaSortering,
   sattFilter,
   setViewSpec,
   sorteraOm,
   sorteringenArInaktuell,
-  tathet,
-  theme,
   verktygsfalt,
   viewIsLimited,
 } from '../../state/store.js'
@@ -60,7 +56,6 @@ export function Skal() {
     lagen,
   } = s
 
-  useEffect(() => applyAppearance(), [theme.value, tathet.value, verktygsfalt.value])
 
   const h = useHandlingar(s)
   const {

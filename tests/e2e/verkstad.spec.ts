@@ -303,8 +303,8 @@ test('att stänga verkstaden kastar inte arbetet, men Kasta arbetet gör det', a
   await expect(page.locator('.verkstad__par')).toHaveCount(1)
 
   // Att kasta är en egen handling, och den frågar när det finns något att kasta.
-  page.on('dialog', (d) => d.accept())
   await page.getByRole('button', { name: 'Kasta arbetet' }).click()
+  await page.getByRole('dialog').getByRole('button', { name: 'Kasta arbetet' }).click()
   await expect(page.locator('.verkstad')).toHaveCount(0)
   await page.getByRole('button', { name: 'Flera filer ▾' }).click()
   await expect(page.getByRole('menuitem', { name: 'Fortsätt beta av resten…' })).toBeDisabled()
@@ -361,8 +361,8 @@ test('en kastad session är kastad även efter nästa omladdning', async ({ page
 
   // Kasta utan att först gå in i verkstaden: stäng en källflik. Det är vägen
   // som glömdes — att öppna vyn råkar synka om sessionen och dölja felet.
-  page.on('dialog', (d) => d.accept())
   await page.getByRole('button', { name: 'Stäng exempel-order.csv' }).click()
+  await page.getByRole('dialog').getByRole('button', { name: 'Stäng ändå' }).click()
   await vantaPaBorttaget(page, '"id":"verkstad"')
 
   await page.reload()
@@ -379,8 +379,8 @@ test('en stängd källfil tar verkstaden med sig, och säger det', async ({ page
   await page.keyboard.press('Escape')
 
   // Utan frågan låg sessionen kvar som en zombie med två döda flik-id.
-  page.on('dialog', (d) => d.accept())
   await page.getByRole('button', { name: 'Stäng exempel-order.csv' }).click()
+  await page.getByRole('dialog').getByRole('button', { name: 'Stäng ändå' }).click()
   await page.getByRole('button', { name: 'Flera filer ▾' }).click()
   await expect(page.getByRole('menuitem', { name: 'Fortsätt beta av resten…' })).toBeDisabled()
 })

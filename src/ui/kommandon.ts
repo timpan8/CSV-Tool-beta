@@ -107,6 +107,7 @@ export interface Kommandohandlare {
   vaxlaTema: () => void
   vaxlaSprak: () => void
   vaxlaVerktygsfalt: () => void
+  installningar: () => void
   glomSparat: () => void
   borjaOm: () => void
 }
@@ -406,6 +407,15 @@ export function byggKommandon(lage: Kommandolage, h: Kommandohandlare): Kommando
     }
   }
 
+  lagg({
+    id: 'installningar',
+    grupp: t('Visa'),
+    etikett: t('Inställningar…'),
+    genvag: 'Mod+,',
+    iFalt: true,
+    ord: 'settings tema täthet verktygsfält språk lagring om version',
+    kor: h.installningar,
+  })
   lagg({ id: 'tema', grupp: t('Visa'), etikett: t('Byt ljust eller mörkt läge'), ord: 'dark light tema', kor: h.vaxlaTema })
   lagg({
     id: 'sprak',

@@ -135,18 +135,20 @@ export function useTangentbord({
         return
       }
 
-      const nu = nuLage()
-      if (!nu) return
-      const { tab, sel: markering } = nu
-
       /*
        * Genvägarna bor i registret. Ctrl+Z, Ctrl+S, Ctrl+F, Ctrl+X, Ctrl+C,
        * Ctrl+D, Ctrl+A och Delete är kommandon med en genväg, inte fall i en
        * switch — samma lista som paletten visar och menyerna skriver ut.
+       * Registret vet självt vad som finns utan fil (inställningarna, att
+       * öppna en fil), så det prövas före filkontrollen.
        */
       if (korGenvag(lagen.current.kommandon, e, iFalt)) return
       // Övriga modifierade tangenter lämnas åt webbläsaren.
       if (mod) return
+
+      const nu = nuLage()
+      if (!nu) return
+      const { tab, sel: markering } = nu
 
       if (iFalt) return
       // Enter och mellanslag på en knapp är knappens egen aktivering, inte

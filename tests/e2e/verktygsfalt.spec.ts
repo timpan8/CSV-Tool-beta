@@ -53,11 +53,14 @@ test('redigeringsfältet kan läggas lodrätt, och valet överlever en omladdnin
   await oppnaExempel(page)
   await expect(page.locator('.redigeringsfalt--rad')).toBeVisible()
 
+  // Inställningarna är en dialog. Valen slår igenom direkt, och dialogen
+  // stängs med Escape när man är klar.
   await installningar(page).click()
-  await expect(
-    page.getByRole('menuitemradio', { name: 'Verktygsfält: som rad' }),
-  ).toHaveAttribute('aria-checked', 'true')
-  await page.getByRole('menuitemradio', { name: 'Verktygsfält: lodrätt' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Inställningar' })
+  await expect(dialog.getByRole('radio', { name: 'Som rad' })).toHaveAttribute('aria-checked', 'true')
+  await dialog.getByRole('radio', { name: 'Lodrätt' }).click()
+  await page.keyboard.press('Escape')
+  await expect(dialog).toHaveCount(0)
 
   const lodrat = page.locator('.redigeringsfalt--lodrat')
   await expect(lodrat).toBeVisible()
@@ -79,18 +82,41 @@ test('redigeringsfältet kan läggas lodrätt, och valet överlever en omladdnin
   await expect(page.locator('.redigeringsfalt--lodrat')).toBeVisible()
 
   await installningar(page).click()
-  await page.getByRole('menuitemradio', { name: 'Verktygsfält: som rad' }).click()
+  await dialog.getByRole('radio', { name: 'Som rad' }).click()
+  await page.keyboard.press('Escape')
   await expect(page.locator('.redigeringsfalt--rad')).toBeVisible()
 })
 
-test('temat går att sätta tillbaka till att följa systemet', async ({ page }) => {
+test('temat går att sätta tillbaka till att följa systemet, och Ctrl+, öppnar dialogen', async ({
+  page,
+}) => {
   await page.goto('/')
   await installningar(page).click()
-  await page.getByRole('menuitemradio', { name: 'Tema: mörkt' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Inställningar' })
+  await dialog.getByRole('radio', { name: 'Mörkt' }).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
-
-  // Sol/måne-knappen kan bara växla mellan ljust och mörkt; menyn kan mer.
-  await installningar(page).click()
-  await page.getByRole('menuitemradio', { name: 'Tema: följer systemet' }).click()
+  await dialog.getByRole('radio', { name: 'Följer systemet' }).click()
   await expect(page.locator('html')).not.toHaveAttribute('data-theme', /./)
+  await page.keyboard.press('Escape')
+  await expect(dialog).toHaveCount(0)
+
+  // Genvägen når dialogen utan fil och utan mus.
+  await page.keyboard.press('Control+,')
+  await expect(dialog).toBeVisible()
+  await expect(dialog).toContainText('CSV-verkstan 0.')
+})
+
+test('tätheten går att ändra, och valet sparas', async ({ page }) => {
+  await oppnaExempel(page)
+  const fore = (await page.locator('.rutnat__rad').first().boundingBox())!.height
+  await installningar(page).click()
+  const dialog = page.getByRole('dialog', { name: 'Inställningar' })
+  await dialog.getByRole('radio', { name: 'Kompakt' }).click()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('html')).toHaveAttribute('data-tathet', 'kompakt')
+  const efter = (await page.locator('.rutnat__rad').first().boundingBox())!.height
+  expect(efter).toBeLessThan(fore)
+
+  await page.reload()
+  await expect(page.locator('html')).toHaveAttribute('data-tathet', 'kompakt')
 })

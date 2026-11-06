@@ -30,6 +30,7 @@ export function byggRegister({
   frame,
   palettFil,
   setBorjaOmOppen,
+  setInstallningarOppna,
   setExportOppen,
   setProfilerOppna,
   setSokOppen,
@@ -68,6 +69,7 @@ export function byggRegister({
   | 'frame'
   | 'palettFil'
   | 'setBorjaOmOppen'
+  | 'setInstallningarOppna'
   | 'setExportOppen'
   | 'setProfilerOppna'
   | 'setSokOppen'
@@ -220,6 +222,7 @@ export function byggRegister({
         theme.value = theme.value === 'dark' ? 'light' : 'dark'
       },
       vaxlaSprak: () => sattSprak(sprak.value === 'en' ? 'sv' : 'en'),
+      installningar: () => setInstallningarOppna(true),
       vaxlaVerktygsfalt: () => {
         verktygsfalt.value = verktygsfalt.value === 'rad' ? 'lodrat' : 'rad'
       },

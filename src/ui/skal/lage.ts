@@ -103,6 +103,7 @@ export function useSkalLage() {
   const [sokOppen, setSokOppen] = useState(false)
   const [inklistring, setInklistring] = useState<PasteState | null>(null)
   const [borjaOmOppen, setBorjaOmOppen] = useState(false)
+  const [installningarOppna, setInstallningarOppna] = useState(false)
   /**
    * Vilket städverktyg som är öppet, och på vilka kolumner.
    *
@@ -168,6 +169,8 @@ export function useSkalLage() {
     setInklistring,
     borjaOmOppen,
     setBorjaOmOppen,
+    installningarOppna,
+    setInstallningarOppna,
     verktyg,
     setVerktyg,
     tabellverktyg,

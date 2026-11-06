@@ -188,8 +188,11 @@ export const FLERFIL: Record<string, string> = {
   'Exportera restlistorna': 'Export the leftover lists',
   'Paren, avvisningarna och avskrivningarna finns bara här och går inte att ångra.':
     'The pairs, rejections and write-offs exist only here and cannot be undone.',
-  'Kasta arbetet i verkstaden? {0} beslut försvinner.':
-    'Throw away the work in the workbench? {0} decisions disappear.',
+  'Kasta arbetet i verkstaden?': 'Throw away the work in the workbench?',
+  '{0} beslut försvinner och går inte att ångra.': '{0} decisions disappear and cannot be undone.',
+  'Börja om sammanslagningen?': 'Start the merge over?',
+  'Den påbörjade sammanslagningen {0} ↔ {1} har {2} beslut som inte finns någon annanstans.':
+    'The merge in progress {0} ↔ {1} has {2} decisions that exist nowhere else.',
   'Kasta arbetet': 'Throw the work away',
   'Slå ihop igen': 'Merge again',
   ' — kvar': ' — leftovers',

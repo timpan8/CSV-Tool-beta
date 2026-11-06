@@ -1,3 +1,4 @@
+import { tathet } from '../../state/store.js'
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { Column, ColumnId, Frame } from '../../core/types.js'
 import { Flag } from '../../core/types.js'
@@ -134,11 +135,18 @@ export function VirtualGrid(props: GridProps) {
     [columns, frame, props.revision],
   )
 
+  // Radhöjden kommer ur CSS-variabeln och mäts om när tätheten byts:
+  // inställningen ändrar variabeln, och virtualiseringen räknar på talet.
   useLayoutEffect(() => {
     const el = scrollerRef.current
     if (!el) return
     const measured = parseFloat(getComputedStyle(el).getPropertyValue('--radhojd'))
     if (Number.isFinite(measured) && measured > 0) setRowHeight(measured)
+  }, [tathet.value])
+
+  useLayoutEffect(() => {
+    const el = scrollerRef.current
+    if (!el) return
     const observer = new ResizeObserver(() => setViewportHeight(el.clientHeight))
     observer.observe(el)
     setViewportHeight(el.clientHeight)

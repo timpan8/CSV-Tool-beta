@@ -1,21 +1,19 @@
-import { theme } from '../../state/store.js'
 import { KANAL, STABIL_URL, VERSION } from '../../version.js'
-import { IkonExportera, IkonKugghjul, IkonMane, IkonProfiler, IkonSol } from '../ikoner.jsx'
+import { IkonExportera, IkonKugghjul, IkonProfiler } from '../ikoner.jsx'
 import { sattSprak, sprak, t } from '../sprak.js'
 import { FilValjare } from './Flikrad.jsx'
 import type { Handlingar } from './handlingar.js'
 import type { SkalLage } from './lage.js'
-import { installningsmeny } from './menyer.js'
 
 /** App-raden överst: namn, öppna, profiler, exportera, språk, tema, inställningar. */
 export function Verktygsrad({
   frame,
   setProfilerOppna,
   setExportOppen,
-  setMeny,
+  setInstallningarOppna,
   oppnaFiler,
   egenVy,
-}: Pick<SkalLage, 'frame' | 'setProfilerOppna' | 'setExportOppen' | 'setMeny'> &
+}: Pick<SkalLage, 'frame' | 'setProfilerOppna' | 'setExportOppen' | 'setInstallningarOppna'> &
   Pick<Handlingar, 'oppnaFiler'> & { egenVy: boolean }) {
   return (
     <div class="verktygsrad">
@@ -92,24 +90,16 @@ export function Verktygsrad({
             </button>
           ))}
         </div>
-        <button
-          class="knapp knapp--ikon knapp--rund"
-          title={t('Ljust eller mörkt läge')}
-          aria-label={t('Ljust eller mörkt läge')}
-          onClick={() => {
-            theme.value = theme.value === 'dark' ? 'light' : 'dark'
-          }}
-        >
-          {theme.value === 'dark' ? <IkonSol /> : <IkonMane />}
-        </button>
+        {/*
+          Ett kugghjul, en dialog. Sol/måne-knappen som stod här kunde bara
+          växla mellan ljust och mörkt; dialogen har alla tre temalägena,
+          och tätheten, som förut inte gick att nå alls.
+        */}
         <button
           class="knapp knapp--ikon knapp--rund"
           title={t('Inställningar')}
           aria-label={t('Inställningar')}
-          onClick={(e) => {
-            const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
-            setMeny({ x: r.left, y: r.bottom + 4, poster: installningsmeny() })
-          }}
+          onClick={() => setInstallningarOppna(true)}
         >
           <IkonKugghjul />
         </button>

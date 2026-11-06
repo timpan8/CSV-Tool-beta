@@ -1,3 +1,4 @@
+import { bekrafta } from '../../state/bekraftelse.js'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { formatCount } from '../../core/locale/sv.js'
 import { activeTabId, closeTab, dopOmFlik, tabs, type Tab } from '../../state/store.js'
@@ -71,10 +72,15 @@ function flikmeny(tab: Tab, borjaDopOm: () => void): (MenyPost | 'avdelare')[] {
 }
 
 /** Stänger fliken, med samma frågor oavsett om det var krysset eller menyn. */
-function stangFlik(tab: Tab): void {
+async function stangFlik(tab: Tab): Promise<void> {
   if (
     tab.smutsig &&
-    !window.confirm(`${tab.frame.name} har ändringar som inte exporterats. Stänga ändå?`)
+    !(await bekrafta({
+      rubrik: tf('Stänga {0}?', tab.frame.name),
+      text: t('Filen har ändringar som inte exporterats.'),
+      ok: t('Stäng ändå'),
+      fara: true,
+    }))
   ) {
     return
   }
@@ -92,9 +98,15 @@ function stangFlik(tab: Tab): void {
     const ogjort = ogjortArbete(s)
     if (
       ogjort > 0 &&
-      !window.confirm(
-        `${tab.frame.name} används av en påbörjad sammanslagning med ${ogjort} beslut. Stänger du fliken går de förlorade.`,
-      )
+      !(await bekrafta({
+        rubrik: tf('Stänga {0}?', tab.frame.name),
+        text: tf(
+          'Filen används av en påbörjad sammanslagning med {0} beslut. Stänger du fliken går de förlorade.',
+          ogjort,
+        ),
+        ok: t('Stäng ändå'),
+        fara: true,
+      }))
     ) {
       return
     }
