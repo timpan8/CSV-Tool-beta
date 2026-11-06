@@ -1,4 +1,4 @@
-import { signal } from '@preact/signals'
+import { arUppe, oppnaVy, stangVy } from './vylage.js'
 
 /**
  * Om jämförelsevyn är öppen.
@@ -7,12 +7,12 @@ import { signal } from '@preact/signals'
  * arbete över tid, den läser raderna i körningsögonblicket, så det finns
  * inget att spara och inget som kan bli inaktuellt.
  */
-export const jamforOppen = signal(false)
+export const jamforOppen = arUppe('jamfor')
 
 export function oppnaJamfor(): void {
-  jamforOppen.value = true
+  oppnaVy({ typ: 'jamfor' })
 }
 
 export function stangJamfor(): void {
-  jamforOppen.value = false
+  stangVy('jamfor')
 }

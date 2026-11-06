@@ -597,6 +597,8 @@ window.GUIDE_SV = {
             ['Ctrl+D', 'Fyll nedåt'],
             ['Delete', 'Töm markeringen'],
             ['Ctrl+C · Ctrl+V', 'Kopiera · Klistra in (TSV, som Excel)'],
+            ['Ctrl+X', 'Klipp ut'],
+            ['Ctrl+A', 'Markera allt'],
             ['Ctrl+Skift+V', 'Klistra in som en ny fil'],
             ['F2 i rubriken', 'Byt namn på kolumnen'],
             ['Menytangenten', 'Öppnar menyn vid markeringen']

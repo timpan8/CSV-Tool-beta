@@ -1,4 +1,5 @@
 import { signal } from '@preact/signals'
+import { arUppe, oppnaVy, stangVy } from './vylage.js'
 
 /**
  * Om kombineringsvyn är öppen.
@@ -10,7 +11,7 @@ import { signal } from '@preact/signals'
  * alls. Det som ändå måste stämma — att en vald flik fortfarande finns — faller
  * ut av att kartan ritas ur `tabs.value`.
  */
-export const kombineraOppen = signal(false)
+export const kombineraOppen = arUppe('kombinera')
 
 /**
  * Fliken som används som mall, eller null för filernas egna kolumner.
@@ -37,11 +38,11 @@ export function oppnaKombinera(medMall = false): void {
   mallTabId.value = null
   vantarPaMall.value = false
   begarMall.value = medMall
-  kombineraOppen.value = true
+  oppnaVy({ typ: 'kombinera' })
 }
 
 export function stangKombinera(): void {
-  kombineraOppen.value = false
+  stangVy('kombinera')
   vantarPaMall.value = false
   begarMall.value = false
 }

@@ -545,6 +545,8 @@ This is one of the few actions that **cannot** be undone.
 | `Ctrl+D` | Fill down |
 | `Delete` | Empty the selection |
 | `Ctrl+C` · `Ctrl+V` | Copy · Paste (TSV, as Excel does) |
+| `Ctrl+X` | Cut |
+| `Ctrl+A` | Select all |
 | `Ctrl+Shift+V` | Paste as a new file |
 | `F2` in the header | Rename the column |
 | The menu key | Opens the menu at the selection |

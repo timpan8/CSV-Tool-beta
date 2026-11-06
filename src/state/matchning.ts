@@ -1,3 +1,4 @@
+import { arUppe, oppnaVy, stangVy } from './vylage.js'
 import { effect, signal } from '@preact/signals'
 import {
   matcha,
@@ -115,7 +116,7 @@ export interface Radform {
 export const verkstad = signal<Verkstad | null>(null)
 
 /** Om vyn är uppe. Sant betyder alltid att `verkstad` också finns. */
-export const verkstadOppen = signal(false)
+export const verkstadOppen = arUppe('verkstad')
 
 export interface Verkstadsflikar {
   vanster: Tab
@@ -193,7 +194,7 @@ export function oppnaVerkstad(
     hogerForm: radform(hoger.frame),
     resultatTabIds: [],
   }
-  verkstadOppen.value = true
+  oppnaVy({ typ: 'verkstad' })
 }
 
 /** Bokför fliken en körning skapade, så att verkstaden går att hitta därifrån. */
@@ -224,7 +225,7 @@ export function aterupptaVerkstad(): Synkning {
    */
   const svar = synkaVerkstad()
   if (svar === 'ingen' || svar === 'stangd') return svar
-  verkstadOppen.value = true
+  oppnaVy({ typ: 'verkstad' })
   return svar
 }
 
@@ -266,7 +267,7 @@ function samma(frame: Frame, form: Radform): boolean {
  * använd till två olika saker.
  */
 export function lamnaVerkstad(): void {
-  verkstadOppen.value = false
+  stangVy('verkstad')
 }
 
 /**
@@ -277,7 +278,7 @@ export function lamnaVerkstad(): void {
  */
 export function kastaVerkstad(): void {
   verkstad.value = null
-  verkstadOppen.value = false
+  stangVy('verkstad')
 }
 
 export type Synkning = 'ingen' | 'ok' | 'stangd' | 'omnumrerad'
@@ -712,7 +713,7 @@ export async function aterstallVerkstad(): Promise<boolean> {
     return false
   }
   verkstad.value = verkstadAvSparad(data)
-  verkstadOppen.value = false
+  stangVy('verkstad')
   laddad = true
   /*
    * Bokför det lästa som redan skrivet. Effekten nedan dedupar mot `sparad`,

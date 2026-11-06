@@ -1,4 +1,4 @@
-import { signal } from '@preact/signals'
+import { arUppe, oppnaVy, stangVy } from './vylage.js'
 
 /**
  * Om vyn för att slå ihop två filer är öppen.
@@ -13,12 +13,12 @@ import { signal } from '@preact/signals'
  * kommandopaletten och verktygsradens meny ska kunna öppna den utan att
  * appen behöver skicka ned en handtagskedja.
  */
-export const slaIhopOppen = signal(false)
+export const slaIhopOppen = arUppe('slaihop')
 
 export function oppnaSlaIhop(): void {
-  slaIhopOppen.value = true
+  oppnaVy({ typ: 'slaihop' })
 }
 
 export function stangSlaIhop(): void {
-  slaIhopOppen.value = false
+  stangVy('slaihop')
 }
