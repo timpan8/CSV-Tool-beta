@@ -1,3 +1,4 @@
+import { bekrafta } from '../state/bekraftelse.js'
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import type { Column, ColumnId, Frame } from '../core/types.js'
 import { findColumn, visibleColumns } from '../core/frame/frame.js'
@@ -488,11 +489,16 @@ export function Verkstad(props: {
         <button
           class="knapp knapp--fara"
           title={t('Paren, avvisningarna och avskrivningarna finns bara här och går inte att ångra.')}
-          onClick={() => {
+          onClick={async () => {
             const gjort = ogjortArbete(s)
             if (
               gjort > 0 &&
-              !window.confirm(tf('Kasta arbetet i verkstaden? {0} beslut försvinner.', gjort))
+              !(await bekrafta({
+                rubrik: t('Kasta arbetet i verkstaden?'),
+                text: tf('{0} beslut försvinner och går inte att ångra.', gjort),
+                ok: t('Kasta arbetet'),
+                fara: true,
+              }))
             ) {
               return
             }

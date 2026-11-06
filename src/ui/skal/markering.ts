@@ -1,3 +1,4 @@
+import { fragaText } from '../../state/bekraftelse.js'
 import { useMemo } from 'preact/hooks'
 import { parseDelimitedText } from '../../core/csv/parse.js'
 import { toDelimited } from '../../core/csv/stringify.js'
@@ -175,11 +176,15 @@ export function useMarkering({
    * strängen. Att skriva samma ortsnamn i fyrtio celler för hand är precis
    * det slit verktyget finns för.
    */
-  const fyllMarkering = () => {
+  const fyllMarkering = async () => {
     const nu = nuLage()
     if (!nu || !nu.sel) return
     const antal = antalCeller(nu.sel)
-    const svar = window.prompt(`Fyll ${celler(antal)} med värdet`, '')
+    const svar = await fragaText({
+      rubrik: tf('Fyll {0}', celler(antal)),
+      falt: { etikett: t('Värde'), varde: '' },
+      ok: t('Fyll'),
+    })
     if (svar === null) return
     const andrade = sattMarkering(nu.tab, nu.sel, svar)
     if (andrade === 0) {
