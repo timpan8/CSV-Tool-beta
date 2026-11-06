@@ -28,6 +28,7 @@ import {
   tillampaForhandsvisning,
 } from './edits.js'
 import { runStep, type Tab } from './store.js'
+import { LAGRINGSPREFIX } from '../version.js'
 
 /**
  * Profiler: lagring och uppspelning.
@@ -44,7 +45,7 @@ import { runStep, type Tab } from './store.js'
  * är den som ger antalet ändrade celler i rapporten.
  */
 
-const NYCKEL = 'csv-verkstan.profiler'
+const NYCKEL = `${LAGRINGSPREFIX}.profiler`
 
 export const profiler = signal<Profil[]>(las())
 

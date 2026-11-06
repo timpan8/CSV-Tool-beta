@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
-import { Modal, Notis, Val } from './parts.js'
+import { Notis, Val } from './parts.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import { DELIMITER_NAMES } from '../core/csv/sniff.js'
 import type { Delimiter, Encoding } from '../core/types.js'
 import { dataWorker } from '../worker/client.js'
@@ -129,24 +130,18 @@ export function ImportDialog(props: {
   const storlek = formatByte(props.file.size)
 
   return (
-    <Modal
+    <Verktygsyta
+      yta="dialog"
       titel={tf('Öppna {0}', props.file.name)}
       underrubrik={storlek}
       onStang={props.onAvbryt}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onAvbryt}>
-            {t('Avbryt')}
-          </button>
-          <button
-            class="knapp knapp--primar"
-            disabled={preview === null}
-            onClick={() => props.onOppna(settings)}
-          >
-            {t('Öppna filen')}
-          </button>
-        </>
-      }
+      fot={{
+        primar: {
+          etikett: t('Öppna filen'),
+          kan: preview !== null,
+          kor: () => props.onOppna(settings),
+        },
+      }}
     >
       {arExcel ? (
         <div class="faltrad">
@@ -268,7 +263,7 @@ export function ImportDialog(props: {
           )}
         </div>
       )}
-    </Modal>
+    </Verktygsyta>
   )
 }
 

@@ -9,6 +9,7 @@ import {
   rader as svRader,
 } from '../core/locale/sv.js'
 import { EN } from './sprak/en.js'
+import { LAGRINGSPREFIX } from '../version.js'
 
 /**
  * Gränssnittets språk.
@@ -30,7 +31,7 @@ import { EN } from './sprak/en.js'
  */
 export type Sprak = 'sv' | 'en'
 
-const NYCKEL = 'csv-verkstan.sprak'
+const NYCKEL = `${LAGRINGSPREFIX}.sprak`
 
 function last(): Sprak {
   try {

@@ -99,6 +99,7 @@ import { SearchBar } from './SearchBar.jsx'
 import { PasteDialog } from './PasteDialog.jsx'
 import { BorjaOmDialog } from './BorjaOmDialog.jsx'
 import { celler, filer as filerText, kolumner as kolumnerText, rader as raderText, sattSprak, sprak, t, tf } from './sprak.js'
+import { KANAL, STABIL_URL, VERSION } from '../version.js'
 import { Verktyg, ordnaVerktyg, type Verktygsnamn } from './verktyg.jsx'
 import { dopOmIRegel } from '../core/ops/columns.js'
 import { innehallsprofil } from '../core/frame/innehall.js'
@@ -1547,6 +1548,16 @@ export function App() {
       }
 
       if (iFalt) return
+      // Enter och mellanslag på en knapp är knappens egen aktivering, inte
+      // rutnätets. Utan den här raden började Enter på *Exportera* redigera
+      // cellen i stället för att öppna dialogen.
+      if (
+        target &&
+        (target.tagName === 'BUTTON' || target.tagName === 'A') &&
+        !target.closest('[role=grid]')
+      ) {
+        return
+      }
 
       switch (e.key) {
         case 'ArrowUp':
@@ -1912,6 +1923,20 @@ export function App() {
           </span>
           CSV-verkstan
         </span>
+        {KANAL === 'beta' && (
+          /*
+           * Beta-märket är en länk till den stabila utgåvan. Den som fastnar
+           * i något halvfärdigt ska ha en väg till verktyget som fungerar,
+           * ett klick bort och inte i en README.
+           */
+          <a
+            class="verktygsrad__kanal"
+            href={STABIL_URL}
+            title={t('Det här är betaversionen. Klicka för den stabila.')}
+          >
+            Beta <span class="verktygsrad__version">{VERSION}</span>
+          </a>
+        )}
 
         {/*
           App-raden bär filens ärenden: öppna, spara arbetsgången, skriva ut.

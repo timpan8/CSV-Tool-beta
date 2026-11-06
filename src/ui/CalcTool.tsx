@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
-import { Resultat, Verktygspanel } from './Verktygspanel.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
+import { Resultat } from './yta/Resultat.js'
 import { Notis, Val } from './parts.js'
 import type { Column, Frame } from '../core/types.js'
 import { FUNKTIONSHJALP, formelTransform, tolkaFormel } from '../core/ops/formel.js'
@@ -73,31 +74,24 @@ export function CalcTool(props: {
   const kanKoras = tolkning.rot !== null && forh.andrade > 0
 
   return (
-    <Verktygspanel
+    <Verktygsyta
+      yta="panel"
       titel={t('Räkna')}
       underrubrik={rent}
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onStang}>
-            {t('Avbryt')}
-          </button>
-          <button
-            class="knapp knapp--primar"
-            disabled={!kanKoras}
-            title={
-              tolkning.rot === null
-                ? t('Skriv en formel som går att räkna.')
-                : forh.andrade === 0
-                  ? t('Ingen rad gav ett värde.')
-                  : undefined
-            }
-            onClick={() => props.onTillampa([forh])}
-          >
-            {t('Skapa kolumnen')}
-          </button>
-        </>
-      }
+      fot={{
+        primar: {
+          etikett: t('Skapa kolumnen'),
+          kan: kanKoras,
+          titel:
+            tolkning.rot === null
+              ? t('Skriv en formel som går att räkna.')
+              : forh.andrade === 0
+                ? t('Ingen rad gav ett värde.')
+                : undefined,
+          kor: () => props.onTillampa([forh]),
+        },
+      }}
     >
       <div class="falt">
         <span class="falt__etikett">{t('Formel')}</span>
@@ -206,6 +200,6 @@ export function CalcTool(props: {
             <strong class="verktyg__problem">{formatCount(forh.ifyllda - forh.andrade)}</strong>,
           )}
       </Resultat>
-    </Verktygspanel>
+    </Verktygsyta>
   )
 }

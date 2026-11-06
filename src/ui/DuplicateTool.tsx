@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'preact/hooks'
-import { Verktygspanel } from './Verktygspanel.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import { Notis, Val } from './parts.js'
 import type { Frame } from '../core/types.js'
 import { visibleColumns } from '../core/frame/frame.js'
@@ -70,7 +70,8 @@ export function DuplicateTool(props: {
   const valda = nyckel.kolumner.length === 0 ? kolumner.map((c) => c.id) : nyckel.kolumner
 
   return (
-    <Verktygspanel
+    <Verktygsyta
+      yta="panel"
       titel={t('Dubbletter')}
       underrubrik={
         grupper.antalGrupper === 0
@@ -78,20 +79,16 @@ export function DuplicateTool(props: {
           : `${grupperText(grupper.antalGrupper)} · ${raderText(grupper.antalRader)}`
       }
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onStang}>
-            {t('Stäng')}
-          </button>
-          <button
-            class="knapp knapp--fara"
-            disabled={grupper.antalOverflodiga === 0}
-            onClick={() => props.onTaBort(nyckel, props.behall)}
-          >
-            {tf('Ta bort {0}', raderText(grupper.antalOverflodiga))}
-          </button>
-        </>
-      }
+      fot={{
+        // Borttagningen är verktygets poäng och därför primär — men röd, och
+        // avstängd tills det finns något att ta bort.
+        primar: {
+          etikett: tf('Ta bort {0}', raderText(grupper.antalOverflodiga)),
+          kan: grupper.antalOverflodiga > 0,
+          fara: true,
+          kor: () => props.onTaBort(nyckel, props.behall),
+        },
+      }}
     >
       <div class="falt">
         <span class="falt__etikett">{t('Rader räknas som lika när de stämmer i')}</span>
@@ -278,6 +275,6 @@ export function DuplicateTool(props: {
           </p>
         )}
       </div>
-    </Verktygspanel>
+    </Verktygsyta>
   )
 }

@@ -15,6 +15,7 @@ import { laddaFlikar, lagringsfel, rensaLagring, sparaFlikar } from './lagring.j
 // Cirkeln store ↔ matchning är ofarlig: båda sidor använder den andres
 // exporter först vid anrop, aldrig under modulinitieringen.
 import { glomdSession, kastaVerkstad } from './matchning.js'
+import { LAGRINGSPREFIX } from '../version.js'
 
 let seq = 0
 const nextId = () => `t${(seq += 1).toString(36)}`
@@ -813,9 +814,9 @@ export type Tathet = 'kompakt' | 'normal' | 'luftig'
 /** Var redigeringsfältet ligger: som en rad under flikarna, eller lodrätt till vänster. */
 export type Verktygsfalt = 'rad' | 'lodrat'
 
-const THEME_KEY = 'csv-verkstan.tema'
-const TATHET_KEY = 'csv-verkstan.tathet'
-const VERKTYGSFALT_KEY = 'csv-verkstan.verktygsfalt'
+const THEME_KEY = `${LAGRINGSPREFIX}.tema`
+const TATHET_KEY = `${LAGRINGSPREFIX}.tathet`
+const VERKTYGSFALT_KEY = `${LAGRINGSPREFIX}.verktygsfalt`
 
 function readStored<T extends string>(key: string, fallback: T, allowed: readonly T[]): T {
   try {

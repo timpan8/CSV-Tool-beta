@@ -1,4 +1,5 @@
 import { signal } from '@preact/signals'
+import { LAGRINGSPREFIX } from '../version.js'
 
 /**
  * De senast använda mallarna.
@@ -17,7 +18,7 @@ import { signal } from '@preact/signals'
  * `sort` skiljer dem åt så att varje panel bara visar sina egna.
  */
 
-const NYCKEL = 'csv-verkstan.mallar'
+const NYCKEL = `${LAGRINGSPREFIX}.mallar`
 
 /**
  * Så många mallar listan minns.
