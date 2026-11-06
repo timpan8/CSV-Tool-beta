@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
-import { Verktygspanel } from './Verktygspanel.js'
+import { Verktygsyta } from './yta/Verktygsyta.js'
 import { Notis, Val } from './parts.js'
 import type { Column, Frame } from '../core/types.js'
 import { delaTillRader, inventeraRadelning, type Radelning } from '../core/ops/rader.js'
@@ -55,28 +55,22 @@ export function RadTool(props: {
   const begransad = frame.view.length < frame.rowCount
 
   return (
-    <Verktygspanel
+    <Verktygsyta
+      yta="panel"
       titel={t('Dela till rader')}
       underrubrik={col.name}
       onStang={props.onStang}
-      fot={
-        <>
-          <button class="knapp" onClick={props.onStang}>
-            {t('Avbryt')}
-          </button>
-          <button
-            class="knapp knapp--primar"
-            disabled={inv.resultat === 0 || avgransare === ''}
-            title={avgransare === '' ? t('Välj vad det ska delas vid.') : undefined}
-            onClick={() => {
-              const { frame: resultat, resultat: rader } = delaTillRader(frame, inst)
-              props.onNyFlik(resultat, tf('Delade till {0} rader i en ny flik.', formatCount(rader)))
-            }}
-          >
-            {tf('Skapa ny flik med {0} rader', formatCount(inv.resultat))}
-          </button>
-        </>
-      }
+      fot={{
+        primar: {
+          etikett: tf('Skapa ny flik med {0} rader', formatCount(inv.resultat)),
+          kan: inv.resultat > 0 && avgransare !== '',
+          titel: avgransare === '' ? t('Välj vad det ska delas vid.') : undefined,
+          kor: () => {
+            const { frame: resultat, resultat: rader } = delaTillRader(frame, inst)
+            props.onNyFlik(resultat, tf('Delade till {0} rader i en ny flik.', formatCount(rader)))
+          },
+        },
+      }}
     >
       <div class="falt">
         <span class="falt__etikett">{t('Vid vilket tecken')}</span>
@@ -166,6 +160,6 @@ export function RadTool(props: {
           'Resultatet blir en ny flik. Den här filen rörs inte — övriga kolumners värden följer med ner på de nya raderna.',
         )}
       </Notis>
-    </Verktygspanel>
+    </Verktygsyta>
   )
 }
